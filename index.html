@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-Jimpitan Digital RT 08 & 09 / RW 03 Dusun Gebang Kelopo</title>
-    
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -25,273 +24,365 @@
             }
         }
     </script>
-    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- HTML5 QRCode Reader -->
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <!-- QRCode Generator -->
+    <!-- QRCode.js for generating QR Codes -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- HTML5-QRCode for Scanning -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
         @media print {
-            body * { visibility: hidden; }
-            #printContent, #printContent * { visibility: visible; }
-            #printContent { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+        }
+        .print-only {
+            display: none;
         }
     </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col antialiased">
+<body class="h-full flex flex-col antialiased text-slate-800">
 
-    <!-- HEADER / NAVBAR -->
-    <header class="bg-gradient-to-r from-brand-800 to-brand-600 text-white shadow-lg sticky top-0 z-30">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="p-2 bg-white/10 rounded-xl backdrop-blur-sm">
-                    <i data-lucide="coins" class="w-6 h-6 text-brand-100"></i>
+    <!-- Top Navigation Header -->
+    <header class="bg-brand-700 text-white sticky top-0 z-30 shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white/10 p-2 rounded-xl backdrop-blur-sm">
+                        <i data-lucide="coins" class="w-6 h-6 text-emerald-300"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight">E-Jimpitan Digital</h1>
+                        <p class="text-xs text-brand-100">RT 08 & 09 / RW 03 Dusun Gebang Kelopo</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="font-bold text-lg leading-tight">E-JIMPITAN DIGITAL</h1>
-                    <p class="text-xs text-brand-100 opacity-90">RT 08 & 09 / RW 03 Dusun Gebang Kelopo</p>
+
+                <!-- Petugas Active Info -->
+                <div class="hidden sm:flex items-center space-x-3 bg-brand-800/50 px-3 py-1.5 rounded-lg border border-brand-600">
+                    <i data-lucide="user-check" class="w-4 h-4 text-emerald-300"></i>
+                    <div class="text-xs">
+                        <span class="block text-brand-200 text-[10px] uppercase font-semibold">Petugas Kartar</span>
+                        <span id="currentOfficerName" class="font-semibold text-white">Budi Santoso</span>
+                    </div>
+                    <button onclick="changeOfficer()" class="ml-2 text-xs bg-brand-600 hover:bg-brand-500 text-white px-2 py-1 rounded transition">Ganti</button>
                 </div>
-            </div>
-            
-            <div class="flex items-center space-x-2 bg-white/10 px-3 py-1.5 rounded-full text-xs backdrop-blur-sm border border-white/20">
-                <i data-lucide="user-check" class="w-4 h-4 text-brand-100"></i>
-                <span id="currentOfficerName" class="font-medium">Petugas Lapangan</span>
-                <button onclick="logout()" class="ml-2 hover:text-rose-200 transition text-white/80" title="Keluar / Logout">
-                    <i data-lucide="log-out" class="w-4 h-4"></i>
-                </button>
             </div>
         </div>
     </header>
 
-    <!-- MAIN CONTENT CONTAINERS -->
-    <main class="flex-grow max-w-6xl w-full mx-auto p-4 space-y-6">
+    <!-- Navigation Tabs for Mobile & Desktop -->
+    <nav class="bg-white border-b border-slate-200 sticky top-16 z-20 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+            <div class="flex space-x-1 sm:space-x-4 overflow-x-auto py-2 scrollbar-none">
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-tab flex items-center space-x-2 px-3 py-2 text-sm font-semibold rounded-lg bg-brand-50 text-brand-700 whitespace-nowrap transition">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button onclick="switchTab('scan')" id="tab-scan" class="nav-tab flex items-center space-x-2 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 whitespace-nowrap transition">
+                    <i data-lucide="qr-code" class="w-4 h-4"></i>
+                    <span>Scan Jimpitan</span>
+                </button>
+                <button onclick="switchTab('warga')" id="tab-warga" class="nav-tab flex items-center space-x-2 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 whitespace-nowrap transition">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                    <span>Data Warga</span>
+                </button>
+                <button onclick="switchTab('riwayat')" id="tab-riwayat" class="nav-tab flex items-center space-x-2 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 whitespace-nowrap transition">
+                    <i data-lucide="history" class="w-4 h-4"></i>
+                    <span>Riwayat & Rekap</span>
+                </button>
+            </div>
+        </div>
+    </nav>
 
-        <!-- NAVIGATION TABS -->
-        <nav class="flex space-x-2 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
-            <button id="tab-dashboard" onclick="switchTab('dashboard')" class="nav-tab flex-1 flex items-center justify-center space-x-2 py-2.5 px-4 rounded-xl font-semibold text-xs transition bg-brand-50 text-brand-700">
-                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-                <span>Dashboard</span>
-            </button>
-            <button id="tab-scan" onclick="switchTab('scan')" class="nav-tab flex-1 flex items-center justify-center space-x-2 py-2.5 px-4 rounded-xl font-semibold text-xs transition text-slate-600 hover:bg-slate-50">
-                <i data-lucide="qr-code" class="w-4 h-4"></i>
-                <span>Scan Jimpitan</span>
-            </button>
-            <button id="tab-warga" onclick="switchTab('warga')" class="nav-tab flex-1 flex items-center justify-center space-x-2 py-2.5 px-4 rounded-xl font-semibold text-xs transition text-slate-600 hover:bg-slate-50">
-                <i data-lucide="users" class="w-4 h-4"></i>
-                <span>Data Warga</span>
-            </button>
-            <button id="tab-riwayat" onclick="switchTab('riwayat')" class="nav-tab flex-1 flex items-center justify-center space-x-2 py-2.5 px-4 rounded-xl font-semibold text-xs transition text-slate-600 hover:bg-slate-50">
-                <i data-lucide="history" class="w-4 h-4"></i>
-                <span>Riwayat & Rekap</span>
-            </button>
-        </nav>
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 no-print">
 
         <!-- VIEW: DASHBOARD -->
         <section id="view-dashboard" class="space-y-6">
-            <!-- STATS CARDS -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-slate-500 mb-2">
-                        <span class="text-xs font-semibold">Total Kas Terkumpul</span>
-                        <i data-lucide="wallet" class="w-4 h-4 text-emerald-600"></i>
-                    </div>
+            <!-- Stat Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Card Total Saldo -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center justify-between">
                     <div>
-                        <h3 id="statTotalSaldo" class="text-xl font-black text-slate-800">Rp 0</h3>
-                        <p class="text-[10px] text-slate-400 mt-0.5">Akumulasi seluruh setoran</p>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Kas Jimpitan</p>
+                        <h3 id="statTotalSaldo" class="text-2xl font-bold text-slate-800 mt-1">Rp 0</h3>
+                        <p class="text-xs text-emerald-600 mt-1 flex items-center gap-1">
+                            <i data-lucide="trending-up" class="w-3 h-3"></i> Terakumulasi
+                        </p>
+                    </div>
+                    <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+                        <i data-lucide="wallet" class="w-6 h-6"></i>
                     </div>
                 </div>
 
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-slate-500 mb-2">
-                        <span class="text-xs font-semibold">Setoran Hari Ini</span>
-                        <i data-lucide="trending-up" class="w-4 h-4 text-emerald-600"></i>
-                    </div>
+                <!-- Card Setoran Hari Ini -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center justify-between">
                     <div>
-                        <h3 id="statTodayIncome" class="text-xl font-black text-emerald-600">Rp 0</h3>
-                        <p id="statTodayCount" class="text-[10px] text-slate-400 mt-0.5">0 Rumah telah bayar</p>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Setoran Hari Ini</p>
+                        <h3 id="statTodayIncome" class="text-2xl font-bold text-slate-800 mt-1">Rp 0</h3>
+                        <p id="statTodayCount" class="text-xs text-slate-500 mt-1">0 Rumah telah bayar</p>
+                    </div>
+                    <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                        <i data-lucide="calendar" class="w-6 h-6"></i>
                     </div>
                 </div>
 
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-slate-500 mb-2">
-                        <span class="text-xs font-semibold">Cakupan Hari Ini</span>
-                        <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-600"></i>
-                    </div>
+                <!-- Card Setoran Bulan Ini -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center justify-between">
                     <div>
-                        <h3 id="statPaidTodayPercent" class="text-xl font-black text-slate-800">0%</h3>
-                        <p class="text-[10px] text-slate-400 mt-0.5">Dari total Kepala Keluarga</p>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Setoran Bulan Ini</p>
+                        <h3 id="statMonthIncome" class="text-2xl font-bold text-slate-800 mt-1">Rp 0</h3>
+                        <p class="text-xs text-slate-500 mt-1">Periode Berjalan</p>
+                    </div>
+                    <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                        <i data-lucide="circle-dollar-sign" class="w-6 h-6"></i>
                     </div>
                 </div>
 
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-slate-500 mb-2">
-                        <span class="text-xs font-semibold">Total Terdata</span>
-                        <i data-lucide="home" class="w-4 h-4 text-emerald-600"></i>
-                    </div>
+                <!-- Card Total Warga -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center justify-between">
                     <div>
-                        <h3 id="statTotalWarga" class="text-xl font-black text-slate-800">0 KK</h3>
-                        <p class="text-[10px] text-slate-400 mt-0.5">RT 08 & RT 09 / RW 03</p>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Rumah / Warga</p>
+                        <h3 id="statTotalWarga" class="text-2xl font-bold text-slate-800 mt-1">0 KK</h3>
+                        <p id="statPaidTodayPercent" class="text-xs text-emerald-600 mt-1 font-medium">0% Tercover hari ini</p>
+                    </div>
+                    <div class="p-3 bg-amber-50 text-amber-600 rounded-xl">
+                        <i data-lucide="home" class="w-6 h-6"></i>
                     </div>
                 </div>
             </div>
 
-            <!-- GRAFIK & AKTIVITAS -->
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="md:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center space-x-2">
-                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-emerald-600"></i>
-                        <span>Perolehan 7 Hari Terakhir</span>
-                    </h3>
-                    <div class="h-64 relative">
+            <!-- Chart & Quick Action Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Grafik Setoran 7 Hari Terakhir -->
+                <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="font-bold text-slate-800">Tren Setoran Jimpitan (7 Hari Terakhir)</h2>
+                            <p class="text-xs text-slate-500">Perkembangan pengumpulan kas harian warga</p>
+                        </div>
+                        <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-medium">Grafik Harian</span>
+                    </div>
+                    <div class="w-full h-64">
                         <canvas id="chartJimpitan"></canvas>
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center space-x-2">
-                            <i data-lucide="clock" class="w-4 h-4 text-emerald-600"></i>
-                            <span>Transaksi Terakhir</span>
+                <!-- Aksi Cepat & Info Petugas Kartar -->
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-br from-brand-700 to-brand-800 text-white p-5 rounded-2xl shadow-md relative overflow-hidden">
+                        <div class="relative z-10">
+                            <span class="bg-brand-600/60 border border-brand-400 text-brand-100 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full">Quick Action</span>
+                            <h3 class="text-xl font-bold mt-2">Mulai Tugas Kartar Malam</h3>
+                            <p class="text-xs text-brand-100 mt-1 leading-relaxed">Siapkan HP/Tablet untuk melakukan pemindaian QR Code kupon/pintu warga saat keliling jimpitan.</p>
+                            
+                            <button onclick="switchTab('scan')" class="mt-4 w-full bg-white text-brand-800 hover:bg-brand-50 font-bold py-2.5 px-4 rounded-xl flex items-center justify-center space-x-2 shadow-sm transition">
+                                <i data-lucide="scan-line" class="w-5 h-5"></i>
+                                <span>Buka Scanner Kamera</span>
+                            </button>
+                        </div>
+                        <!-- Decorative circle -->
+                        <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/5 rounded-full blur-xl"></div>
+                    </div>
+
+                    <!-- Log Aktivitas Terakhir -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                        <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center justify-between">
+                            <span>Aktivitas Setoran Terbaru</span>
+                            <span class="text-xs text-slate-400 font-normal">Realtime</span>
                         </h3>
-                        <div id="dashboardRecentLogs" class="space-y-2.5">
-                            <!-- Injected by JS -->
+                        <div id="dashboardRecentLogs" class="space-y-3 max-h-56 overflow-y-auto pr-1">
+                            <!-- Populated via JS -->
                         </div>
                     </div>
-                    <button onclick="switchTab('riwayat')" class="w-full mt-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">
-                        Lihat Semua Riwayat
-                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- VIEW: SCAN JIMPITAN -->
-        <section id="view-scan" class="hidden max-w-xl mx-auto space-y-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 text-center">
-                <h3 class="text-base font-bold text-slate-800 mb-1">Scan QR Code Rumah Warga</h3>
-                <p class="text-xs text-slate-500 mb-4">Arahkan kamera ke stiker QR Code yang terpasang di rumah warga.</p>
-
-                <!-- NOMINAL PRESET -->
-                <div class="mb-5 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                    <label class="block text-xs font-bold text-slate-600 mb-2">Set Nominal Jimpitan (Rp)</label>
-                    <div class="flex items-center space-x-2">
-                        <input type="number" id="scanNominalInput" value="2000" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        <!-- VIEW: SCANNER QR CODE -->
+        <section id="view-scan" class="hidden space-y-6">
+            <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <div>
+                        <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="scan" class="w-5 h-5 text-brand-600"></i>
+                            Scan QR Code Warga
+                        </h2>
+                        <p class="text-xs text-slate-500">Arahkan kamera ke QR Code milik rumah/warga</p>
                     </div>
+                    <span class="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-semibold">Aktif</span>
                 </div>
 
-                <!-- CAMERA VIEWPORT -->
-                <div id="qr-reader" class="overflow-hidden rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 min-h-[220px] flex items-center justify-center"></div>
+                <div class="p-5 space-y-4">
+                    <!-- Scanner Viewport -->
+                    <div class="relative bg-slate-900 rounded-xl overflow-hidden min-h-[260px] flex items-center justify-center text-slate-400">
+                        <div id="qr-reader" class="w-full"></div>
+                    </div>
 
-                <div class="mt-4 flex space-x-2">
-                    <button id="btnStartScan" onclick="startScanner()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow transition flex items-center justify-center space-x-2">
-                        <i data-lucide="camera" class="w-4 h-4"></i>
-                        <span>Mulai Kamera</span>
-                    </button>
-                    <button id="btnStopScan" onclick="stopScanner()" disabled class="flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-xs rounded-xl transition flex items-center justify-center space-x-2 disabled:opacity-50">
-                        <i data-lucide="camera-off" class="w-4 h-4"></i>
-                        <span>Hentikan Kamera</span>
-                    </button>
-                </div>
-            </div>
+                    <!-- Nominal Input Customization -->
+                    <div class="bg-brand-50/60 p-3.5 rounded-xl border border-brand-100 flex items-center justify-between">
+                        <div>
+                            <label class="block text-xs font-semibold text-brand-800">Nominal Jimpitan Standar</label>
+                            <p class="text-[11px] text-brand-600">Otomatis dicatat saat QR berhasil terdeteksi</p>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <span class="text-xs font-bold text-slate-600">Rp</span>
+                            <input type="number" id="scanNominalInput" value="2000" step="500" class="w-24 px-2 py-1 bg-white border border-brand-200 rounded-lg text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 text-right">
+                        </div>
+                    </div>
 
-            <!-- SIMULASI MANUAL -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                <h4 class="text-xs font-bold text-slate-700 mb-2 flex items-center space-x-1">
-                    <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-400"></i>
-                    <span>Simulasi Tanpa Scan Kamera</span>
-                </h4>
-                <div class="flex space-x-2">
-                    <select id="selectSimulateWarga" class="flex-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                        <option value="">-- Pilih Warga / Rumah --</option>
-                    </select>
-                    <button onclick="simulateScanFromSelect()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-xl transition">
-                        Proses Setor
-                    </button>
+                    <!-- Scanner Control Buttons -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="btnStartScan" onclick="startScanner()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm rounded-xl flex items-center justify-center space-x-2 transition">
+                            <i data-lucide="camera" class="w-4 h-4"></i>
+                            <span>Buka Kamera</span>
+                        </button>
+                        <button id="btnStopScan" onclick="stopScanner()" class="w-full py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-sm rounded-xl flex items-center justify-center space-x-2 transition" disabled>
+                            <i data-lucide="camera-off" class="w-4 h-4"></i>
+                            <span>Matikan Kamera</span>
+                        </button>
+                    </div>
+
+                    <!-- Alternative Manual Selection / Simulation -->
+                    <div class="pt-4 border-t border-slate-100">
+                        <p class="text-xs font-semibold text-slate-600 mb-2 flex items-center gap-1">
+                            <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                            Simulasi Scan Manual (Tanpa Kamera)
+                        </p>
+                        <div class="flex gap-2">
+                            <select id="selectSimulateWarga" class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                <option value="">-- Pilih Warga / Rumah --</option>
+                            </select>
+                            <button onclick="simulateScanFromSelect()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs sm:text-sm font-medium transition flex items-center gap-1 whitespace-nowrap">
+                                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+                                <span>Setor Jimpitan</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- VIEW: DATA WARGA -->
-        <section id="view-warga" class="hidden space-y-4">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div class="flex items-center space-x-2 w-full sm:w-auto">
-                    <div class="relative flex-1 sm:w-64">
-                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
-                        <input type="text" id="searchWarga" onkeyup="renderWargaTable()" placeholder="Cari Nama / No. Rumah..." class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                    </div>
-                    <select id="filterStatus" onchange="renderWargaTable()" class="px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                        <option value="ALL">Semua Status Hari Ini</option>
+        <!-- VIEW: KELOLA DATA WARGA -->
+        <section id="view-warga" class="hidden space-y-6">
+            <!-- Header Controls -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                <div>
+                    <h2 class="font-bold text-slate-800 text-lg">Data Rumah & Warga RT 08 & 09</h2>
+                    <p class="text-xs text-slate-500">Daftar warga terdaftar penerima & kupon QR jimpitan</p>
+                </div>
+                <button onclick="openWargaModal()" class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center justify-center space-x-2 transition shadow-sm">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    <span>Tambah Warga Baru</span>
+                </button>
+            </div>
+
+            <!-- Search & Filter Bar -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="sm:col-span-2 relative">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-slate-400"></i>
+                    <input type="text" id="searchWarga" oninput="renderWargaTable()" placeholder="Cari nama warga, nomor rumah, atau ID..." class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div>
+                    <select id="filterStatus" onchange="renderWargaTable()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="ALL">Semua Status Bayar (Hari Ini)</option>
                         <option value="PAID">Sudah Bayar Hari Ini</option>
                         <option value="UNPAID">Belum Bayar Hari Ini</option>
                     </select>
                 </div>
-
-                <button onclick="openWargaModal()" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow transition flex items-center justify-center space-x-2">
-                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                    <span>Tambah Data Warga</span>
-                </button>
             </div>
 
-            <!-- TABLE WARGA -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <!-- Table Data Warga -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold">
-                                <th class="px-5 py-3">No. Rumah / ID</th>
-                                <th class="px-5 py-3">Nama Kepala Keluarga</th>
-                                <th class="px-5 py-3">Wilayah</th>
-                                <th class="px-5 py-3">Status Hari Ini</th>
-                                <th class="px-5 py-3 text-center">QR Code</th>
-                                <th class="px-5 py-3 text-right">Aksi</th>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold border-b border-slate-100">
+                            <tr>
+                                <th class="px-5 py-3.5">ID / No. Rumah</th>
+                                <th class="px-5 py-3.5">Nama Warga (KK)</th>
+                                <th class="px-5 py-3.5">RT / RW</th>
+                                <th class="px-5 py-3.5">Status Hari Ini</th>
+                                <th class="px-5 py-3.5 text-center">QR Code</th>
+                                <th class="px-5 py-3.5 text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="tableWargaBody" class="divide-y divide-slate-100">
-                            <!-- Injected by JS -->
+                        <tbody id="tableWargaBody" class="divide-y divide-slate-100 text-slate-700">
+                            <!-- Populated via JS -->
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
 
-        <!-- VIEW: RIWAYAT & REKAP -->
-        <section id="view-riwayat" class="hidden space-y-4">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                    <input type="date" id="filterStartDate" onchange="renderHistoryTable()" class="px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                    <span class="text-xs text-slate-400">s/d</span>
-                    <input type="date" id="filterEndDate" onchange="renderHistoryTable()" class="px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                    <input type="text" id="searchHistory" onkeyup="renderHistoryTable()" placeholder="Cari transaksi..." class="px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        <!-- VIEW: RIWAYAT & REKAP LOG -->
+        <section id="view-riwayat" class="hidden space-y-6">
+            <!-- Filter & Action Bar -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 class="font-bold text-slate-800 text-lg">Catatan & Rekap Jimpitan</h2>
+                        <p class="text-xs text-slate-500">Laporan histori masuknya dana jimpitan harian dan bulanan</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="exportToCSV()" class="bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 font-semibold px-3 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                            <span>Export CSV</span>
+                        </button>
+                        <button onclick="window.print()" class="bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold px-3 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition">
+                            <i data-lucide="printer" class="w-4 h-4"></i>
+                            <span>Cetak Laporan</span>
+                        </button>
+                    </div>
                 </div>
 
-                <button onclick="exportToCSV()" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-xl shadow transition flex items-center justify-center space-x-2">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                    <span>Export Rekap CSV</span>
-                </button>
+                <!-- Date Filter -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Filter Tanggal Start</label>
+                        <input type="date" id="filterStartDate" onchange="renderHistoryTable()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Filter Tanggal End</label>
+                        <input type="date" id="filterEndDate" onchange="renderHistoryTable()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Cari Nama / Petugas Kartar</label>
+                        <input type="text" id="searchHistory" oninput="renderHistoryTable()" placeholder="Ketik pencarian..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
             </div>
 
-            <!-- TABLE RIWAYAT -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <!-- Table Riwayat Setoran -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold">
-                                <th class="px-5 py-3">Tanggal & Waktu</th>
-                                <th class="px-5 py-3">Nama Warga</th>
-                                <th class="px-5 py-3">No. Rumah</th>
-                                <th class="px-5 py-3">Nominal Setoran</th>
-                                <th class="px-5 py-3">Petugas Kartar</th>
-                                <th class="px-5 py-3 text-right">Aksi</th>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold border-b border-slate-100">
+                            <tr>
+                                <th class="px-5 py-3.5">Waktu & Tanggal</th>
+                                <th class="px-5 py-3.5">ID & Warga</th>
+                                <th class="px-5 py-3.5">Alamat / No. Rumah</th>
+                                <th class="px-5 py-3.5">Nominal Setoran</th>
+                                <th class="px-5 py-3.5">Petugas Kartar</th>
+                                <th class="px-5 py-3.5 text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="tableHistoryBody" class="divide-y divide-slate-100">
-                            <!-- Injected by JS -->
+                        <tbody id="tableHistoryBody" class="divide-y divide-slate-100 text-slate-700">
+                            <!-- Populated via JS -->
                         </tbody>
                     </table>
                 </div>
@@ -300,47 +391,11 @@
 
     </main>
 
-    <!-- FOOTER -->
-    <footer class="bg-white border-t border-slate-200 mt-auto py-4 text-center text-xs text-slate-500">
-        <p class="font-medium">Inisiatif Karang Taruna Dusun Gebang Kelopo</p>
-        <p class="text-[10px] text-slate-400 mt-0.5">Sistem Pencatatan Jimpitan Digital RT 08 & RT 09 / RW 03</p>
-    </footer>
-
-    <!-- MODAL / HALAMAN LOGIN -->
-    <div id="loginScreen" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-5 text-center">
-            <div class="flex justify-center">
-                <div class="p-3 bg-emerald-100 rounded-2xl text-emerald-600">
-                    <i data-lucide="lock" class="w-8 h-8"></i>
-                </div>
-            </div>
-            <div>
-                <h2 class="text-lg font-bold text-slate-800">Login Pengurus / Petugas</h2>
-                <p class="text-xs text-slate-500 mt-1">E-Jimpitan Digital RT 08 & 09 / RW 03</p>
-            </div>
-
-            <form onsubmit="handleLogin(event)" class="space-y-3 text-left">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Username / Jabatan</label>
-                    <input type="text" id="loginUsername" required placeholder="Contoh: ketua / bendahara1 / petugas" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
-                    <input type="password" id="loginPassword" required placeholder="Masukkan password" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-
-                <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition">
-                    Masuk Sistem
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: TAMBAH / EDIT WARGA -->
-    <div id="modalWarga" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div class="flex justify-between items-center border-b pb-3">
-                <h3 id="modalWargaTitle" class="font-bold text-sm text-slate-800">Tambah Data Warga</h3>
+    <!-- MODAL: Tambah / Edit Warga -->
+    <div id="modalWarga" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 id="modalWargaTitle" class="font-bold text-slate-800 text-lg">Tambah Data Warga Baru</h3>
                 <button onclick="closeWargaModal()" class="text-slate-400 hover:text-slate-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
@@ -350,102 +405,111 @@
                 <input type="hidden" id="wargaId">
                 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nomor Rumah / Stiker *</label>
-                    <input type="text" id="wargaNoRumah" required placeholder="Contoh: A-12 / R-08" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nomor Rumah / Kode KK <span class="text-red-500">*</span></label>
+                    <input type="text" id="wargaNoRumah" required placeholder="Contoh: A-12" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Kepala Keluarga *</label>
-                    <input type="text" id="wargaNama" required placeholder="Nama Lengkap" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Warga / Kepala Keluarga <span class="text-red-500">*</span></label>
+                    <input type="text" id="wargaNama" required placeholder="Contoh: Pak Suprianto" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">RT</label>
-                        <select id="wargaRT" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                            <option value="08">RT 08</option>
-                            <option value="09">RT 09</option>
-                        </select>
+                        <input type="text" id="wargaRT" value="08" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">RW</label>
-                        <input type="text" id="wargaRW" value="03" readonly class="w-full px-3 py-2 bg-slate-100 border border-slate-300 rounded-xl text-xs text-slate-500 font-medium">
+                        <input type="text" id="wargaRW" value="03" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">No. WhatsApp (Opsional)</label>
-                    <input type="tel" id="wargaPhone" placeholder="08xxxxxxxxxx" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nomor HP / WhatsApp (Opsional)</label>
+                    <input type="tel" id="wargaPhone" placeholder="08123456789" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                 </div>
 
-                <div class="flex justify-end space-x-2 pt-3 border-t">
-                    <button type="button" onclick="closeWargaModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow transition">Simpan Warga</button>
+                <div class="pt-3 flex justify-end space-x-2">
+                    <button type="button" onclick="closeWargaModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-xl transition shadow-sm">Simpan Warga</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: PREVIEW & CETAK QR CODE -->
-    <div id="modalQR" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4 text-center">
-            <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="font-bold text-sm text-slate-800">Kartu Stiker QR Jimpitan</h3>
+    <!-- MODAL: Preview & Cetak QR Code Single -->
+    <div id="modalQR" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl text-center space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                <h3 class="font-bold text-slate-800">Kupon QR Code Jimpitan</h3>
                 <button onclick="closeQRModal()" class="text-slate-400 hover:text-slate-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
 
-            <div id="printableCard" class="p-4 border-2 border-dashed border-emerald-500 rounded-2xl bg-emerald-50/50 flex flex-col items-center justify-center space-y-2">
-                <p class="text-[10px] font-bold tracking-widest text-emerald-800 uppercase">E-JIMPITAN GEBANG KELOPO</p>
-                <div id="qrcodeContainer" class="p-2 bg-white rounded-xl shadow-sm"></div>
-                <h4 id="qrModalNama" class="text-sm font-black text-slate-800">Nama Warga</h4>
-                <p id="qrModalNoRumah" class="text-xs font-bold text-emerald-700">Rumah No. A-00</p>
-                <p id="qrModalID" class="text-[10px] font-mono text-slate-400">ID: JMP-000</p>
+            <!-- Card To Be Printed -->
+            <div id="printableCard" class="p-4 bg-slate-50 border-2 border-dashed border-brand-300 rounded-2xl flex flex-col items-center justify-center space-y-2">
+                <div class="text-xs font-bold uppercase tracking-wider text-brand-700">E-JIMPITAN RT 08 & 09 / RW 03</div>
+                <div id="qrcodeContainer" class="p-2 bg-white rounded-xl shadow-xs border border-slate-100"></div>
+                <div>
+                    <h4 id="qrModalNama" class="font-extrabold text-slate-800 text-lg">Nama Warga</h4>
+                    <p id="qrModalNoRumah" class="text-xs text-slate-500 font-semibold">Rumah No. A-01</p>
+                    <p id="qrModalID" class="text-[10px] text-slate-400 font-mono mt-1">ID: JMP-001</p>
+                </div>
             </div>
 
             <div class="flex space-x-2 pt-2">
-                <button onclick="closeQRModal()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">Tutup</button>
-                <button onclick="printSingleQR()" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow transition flex items-center justify-center space-x-1">
+                <button onclick="closeQRModal()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Tutup</button>
+                <button onclick="printSingleQR()" class="flex-1 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl transition flex items-center justify-center space-x-1">
                     <i data-lucide="printer" class="w-3.5 h-3.5"></i>
-                    <span>Cetak Kartu</span>
+                    <span>Cetak QR</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- PRINT CONTAINER (FOR WINDOW PRINT) -->
-    <div id="printContent" class="hidden"></div>
+    <!-- PRINT VIEW ONLY (HIDDEN ON SCREEN) -->
+    <div class="print-only p-8 text-black">
+        <div class="text-center mb-6 border-b pb-4">
+            <h1 class="text-2xl font-bold">REKAP KAS JIMPITAN DIGITAL RT 08 & 09 / RW 03</h1>
+            <p class="text-sm">Dusun Gebang Kelopo</p>
+            <p id="printDate" class="text-xs text-slate-500 mt-1"></p>
+        </div>
+        <div id="printContent"></div>
+    </div>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // --- CREDENTIALS (SISTEM AKSES LOGIN) ---
-        const CREDENTIALS = {
-            "ketua": { pass: "ketua03", name: "Ketua Karang Taruna" },
-            "wakil": { pass: "wakil03", name: "Wakil Ketua" },
-            "bendahara1": { pass: "kas123", name: "Bendahara 1" },
-            "bendahara2": { pass: "kas123", name: "Bendahara 2" },
-            "sekretaris1": { pass: "surat123", name: "Sekretaris 1" },
-            "sekretaris2": { pass: "surat123", name: "Sekretaris 2" },
-            "petugas": { pass: "jimpitan0809", name: "Petugas Lapangan" }
-        };
+        // --- DATA STATE MANAGEMENT ---
+        const STORAGE_KEY_WARGA = 'ejimpitan_warga_v1';
+        const STORAGE_KEY_LOGS = 'ejimpitan_logs_v1';
+        const STORAGE_KEY_OFFICER = 'ejimpitan_officer_v1';
 
-        // --- STORAGE KEYS ---
-        const STORAGE_KEY_WARGA = 'jimpitan_warga_list_v1';
-        const STORAGE_KEY_LOGS = 'jimpitan_logs_list_v1';
-        const STORAGE_KEY_OFFICER = 'jimpitan_officer_name_v1';
-
-        // Sample initial data
-        const defaultWarga = [
-            { id: 'JMP-001', noRumah: 'A-01', nama: 'Bapak Ahmad', rt: '08', rw: '03', phone: '08123456789' },
-            { id: 'JMP-002', noRumah: 'A-02', nama: 'Bapak Sugeng', rt: '08', rw: '03', phone: '08123456780' },
-            { id: 'JMP-003', noRumah: 'B-01', nama: 'Ibu Endang', rt: '09', rw: '03', phone: '08123456781' },
-            { id: 'JMP-004', noRumah: 'B-02', nama: 'Bapak Budi', rt: '09', rw: '03', phone: '08123456782' },
+        // Initial Dummy Data if storage empty
+        const initialWarga = [
+            { id: 'JMP-101', noRumah: 'A-01', nama: 'Bapak Ahmad Subagyo', rt: '08', rw: '03', phone: '08123456781' },
+            { id: 'JMP-102', noRumah: 'A-02', nama: 'Ibu Ratna Pertiwi', rt: '08', rw: '03', phone: '08123456782' },
+            { id: 'JMP-103', noRumah: 'A-03', nama: 'Pak Hendra Wijaya', rt: '08', rw: '03', phone: '08123456783' },
+            { id: 'JMP-104', noRumah: 'B-01', nama: 'Bapak Bambang S.', rt: '09', rw: '03', phone: '08123456784' },
+            { id: 'JMP-105', noRumah: 'B-02', nama: 'Pak Joko Widodo', rt: '09', rw: '03', phone: '08123456785' },
+            { id: 'JMP-106', noRumah: 'C-01', nama: 'Ibu Siti Aminah', rt: '09', rw: '03', phone: '08123456786' },
+            { id: 'JMP-107', noRumah: 'C-02', nama: 'Pak Budi Darmawan', rt: '09', rw: '03', phone: '08123456787' }
         ];
 
-        let wargaList = JSON.parse(localStorage.getItem(STORAGE_KEY_WARGA)) || defaultWarga;
-        let logsList = JSON.parse(localStorage.getItem(STORAGE_KEY_LOGS)) || [];
-        let currentOfficer = localStorage.getItem(STORAGE_KEY_OFFICER) || '';
+        // Seed initial history
+        const todayStr = new Date().toISOString().split('T')[0];
+        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+        const initialLogs = [
+            { id: 'TRX-1001', wargaId: 'JMP-101', noRumah: 'A-01', nama: 'Bapak Ahmad Subagyo', nominal: 2000, timestamp: `${todayStr} 02:15:00`, officer: 'Budi Santoso' },
+            { id: 'TRX-1002', wargaId: 'JMP-102', noRumah: 'A-02', nama: 'Ibu Ratna Pertiwi', nominal: 2000, timestamp: `${todayStr} 02:18:22`, officer: 'Budi Santoso' },
+            { id: 'TRX-1003', wargaId: 'JMP-103', noRumah: 'A-03', nama: 'Pak Hendra Wijaya', nominal: 2000, timestamp: `${yesterday} 01:45:10`, officer: 'Agus Pratama' },
+            { id: 'TRX-1004', wargaId: 'JMP-105', noRumah: 'B-02', nama: 'Pak Joko Widodo', nominal: 2000, timestamp: `${yesterday} 02:05:30`, officer: 'Agus Pratama' }
+        ];
+
+        let wargaList = JSON.parse(localStorage.getItem(STORAGE_KEY_WARGA)) || initialWarga;
+        let logsList = JSON.parse(localStorage.getItem(STORAGE_KEY_LOGS)) || initialLogs;
+        let currentOfficer = localStorage.getItem(STORAGE_KEY_OFFICER) || 'Budi Santoso';
 
         let html5QrcodeScanner = null;
         let chartInstance = null;
@@ -457,399 +521,371 @@
             localStorage.setItem(STORAGE_KEY_OFFICER, currentOfficer);
         }
 
-        // --- LOGIN & LOGOUT LOGIC ---
-        function handleLogin(e) {
-            e.preventDefault();
-            const user = document.getElementById('loginUsername').value.trim().toLowerCase();
-            const pass = document.getElementById('loginPassword').value.trim();
+        window.onload = function() {
+            document.getElementById('currentOfficerName').innerText = currentOfficer;
+            lucide.createIcons();
+            
+            // Set default date range filter
+            document.getElementById('filterEndDate').value = todayStr;
+            const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
+            document.getElementById('filterStartDate').value = thirtyDaysAgo;
 
-            if (CREDENTIALS[user] && CREDENTIALS[user].pass === pass) {
-                currentOfficer = CREDENTIALS[user].name;
-                document.getElementById('currentOfficerName').innerText = currentOfficer;
-                saveData();
+            updateDashboardStats();
+            renderWargaTable();
+            renderHistoryTable();
+            populateSimulateSelect();
+            initChart();
+        };
 
-                document.getElementById('loginScreen').classList.add('hidden');
+        // --- NAVIGATION CONTROLLER ---
+        function switchTab(tabName) {
+            // Hide all sections
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            
+            // Unselect all tabs
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('bg-brand-50', 'text-brand-700');
+                btn.classList.add('text-slate-600', 'hover:bg-slate-100');
+            });
 
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Login Berhasil!',
-                    text: `Selamat bertugas, ${currentOfficer}`,
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Login Gagal',
-                    text: 'Username atau Password salah!'
-                });
+            // Show current section & activate tab
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+            const activeTabBtn = document.getElementById(`tab-${tabName}`);
+            activeTabBtn.classList.add('bg-brand-50', 'text-brand-700');
+            activeTabBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+
+            // Handle Camera Lifecycle
+            if (tabName !== 'scan') {
+                stopScanner();
+            }
+
+            // Refresh views if needed
+            if (tabName === 'dashboard') {
+                updateDashboardStats();
+                updateChartData();
+            } else if (tabName === 'warga') {
+                renderWargaTable();
+            } else if (tabName === 'scan') {
+                populateSimulateSelect();
             }
         }
 
-        function logout() {
+        // Change Active Officer
+        function changeOfficer() {
             Swal.fire({
-                title: 'Keluar dari Sistem?',
-                icon: 'question',
+                title: 'Ganti Petugas Kartar',
+                input: 'text',
+                inputLabel: 'Masukkan Nama Petugas Kartar yang Bertugas',
+                inputValue: currentOfficer,
                 showCancelButton: true,
-                confirmButtonColor: '#e11d48',
-                confirmButtonText: 'Ya, Logout',
-                cancelButtonText: 'Batal'
-            }).then(res => {
-                if (res.isConfirmed) {
-                    currentOfficer = '';
-                    localStorage.removeItem(STORAGE_KEY_OFFICER);
-                    document.getElementById('loginUsername').value = '';
-                    document.getElementById('loginPassword').value = '';
-                    document.getElementById('loginScreen').classList.remove('hidden');
+                confirmButtonColor: '#16a34a',
+                cancelButtonText: 'Batal',
+                confirmButtonText: 'Simpan',
+                inputValidator: (value) => {
+                    if (!value) return 'Nama petugas tidak boleh kosong!';
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    currentOfficer = result.value;
+                    document.getElementById('currentOfficerName').innerText = currentOfficer;
+                    saveData();
+                    Toast.fire({ icon: 'success', title: `Petugas Kartar diganti ke: ${currentOfficer}` });
                 }
             });
         }
 
-        // --- NAVIGATION & TABS ---
-        function switchTab(tabName) {
-            document.querySelectorAll('section[id^="view-"]').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-tab').forEach(el => {
-                el.classList.remove('bg-brand-50', 'text-brand-700');
-                el.classList.add('text-slate-600');
-            });
+        // --- DASHBOARD FUNCTIONS ---
+        function updateDashboardStats() {
+            // 1. Total Saldo
+            const totalSaldo = logsList.reduce((acc, log) => acc + log.nominal, 0);
+            document.getElementById('statTotalSaldo').innerText = formatRupiah(totalSaldo);
 
-            const activeView = document.getElementById(`view-${tabName}`);
-            const activeTab = document.getElementById(`tab-${tabName}`);
+            // 2. Setoran Hari Ini
+            const todayLogs = logsList.filter(log => log.timestamp.startsWith(todayStr));
+            const todaySum = todayLogs.reduce((acc, log) => acc + log.nominal, 0);
+            const todayUniquePaidCount = new Set(todayLogs.map(l => l.wargaId)).size;
 
-            if (activeView) activeView.classList.remove('hidden');
-            if (activeTab) {
-                activeTab.classList.add('bg-brand-50', 'text-brand-700');
-                activeTab.classList.remove('text-slate-600');
-            }
+            document.getElementById('statTodayIncome').innerText = formatRupiah(todaySum);
+            document.getElementById('statTodayCount').innerText = `${todayUniquePaidCount} dari ${wargaList.length} KK telah bayar`;
 
-            if (tabName !== 'scan' && html5QrcodeScanner) {
-                stopScanner();
-            }
+            // 3. Setoran Bulan Ini
+            const currentMonthStr = todayStr.substring(0, 7); // YYYY-MM
+            const monthLogs = logsList.filter(log => log.timestamp.startsWith(currentMonthStr));
+            const monthSum = monthLogs.reduce((acc, log) => acc + log.nominal, 0);
+            document.getElementById('statMonthIncome').innerText = formatRupiah(monthSum);
 
-            if (tabName === 'dashboard') updateDashboard();
-            if (tabName === 'warga') renderWargaTable();
-            if (tabName === 'riwayat') renderHistoryTable();
-            if (tabName === 'scan') populateScanDropdown();
-        }
+            // 4. Total Warga & Persentase Hari Ini
+            document.getElementById('statTotalWarga').innerText = `${wargaList.length} KK`;
+            const paidPct = wargaList.length > 0 ? Math.round((todayUniquePaidCount / wargaList.length) * 100) : 0;
+            document.getElementById('statPaidTodayPercent').innerText = `${paidPct}% tercover hari ini`;
 
-        // --- DASHBOARD LOGIC ---
-        function updateDashboard() {
-            const today = new Date().toISOString().split('T')[0];
+            // Recent activity log on dashboard
+            const recentLogsContainer = document.getElementById('dashboardRecentLogs');
+            recentLogsContainer.innerHTML = '';
 
-            // Total Kas
-            const totalSaldo = logsList.reduce((acc, log) => acc + Number(log.nominal), 0);
-            document.getElementById('statTotalSaldo').innerText = `Rp ${totalSaldo.toLocaleString('id-ID')}`;
+            const sortedLogs = [...logsList].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
 
-            // Setoran Hari Ini
-            const todayLogs = logsList.filter(log => log.timestamp.startsWith(today));
-            const todayIncome = todayLogs.reduce((acc, log) => acc + Number(log.nominal), 0);
-            document.getElementById('statTodayIncome').innerText = `Rp ${todayIncome.toLocaleString('id-ID')}`;
-            document.getElementById('statTodayCount').innerText = `${todayLogs.length} Rumah telah bayar`;
-
-            // Total Warga & Persentase
-            const totalWarga = wargaList.length;
-            document.getElementById('statTotalWarga').innerText = `${totalWarga} KK`;
-            const percent = totalWarga > 0 ? Math.round((todayLogs.length / totalWarga) * 100) : 0;
-            document.getElementById('statPaidTodayPercent').innerText = `${percent}% Tercover hari ini`;
-
-            renderRecentLogs();
-            renderChart();
-        }
-
-        function renderRecentLogs() {
-            const container = document.getElementById('dashboardRecentLogs');
-            const recent = [...logsList].reverse().slice(0, 5);
-
-            if (recent.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 py-2 text-center">Belum ada transaksi setoran.</p>`;
-                return;
-            }
-
-            container.innerHTML = recent.map(log => `
-                <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                    <div class="flex items-center space-x-3">
-                        <div class="p-2 bg-emerald-100 text-emerald-700 rounded-lg font-bold text-xs">
-                            ${log.noRumah}
+            if (sortedLogs.length === 0) {
+                recentLogsContainer.innerHTML = `<p class="text-xs text-slate-400 py-2">Belum ada transaksi setoran jimpitan.</p>`;
+            } else {
+                sortedLogs.forEach(log => {
+                    const el = document.createElement('div');
+                    el.className = 'flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-xs';
+                    el.innerHTML = `
+                        <div class="flex items-center space-x-2.5">
+                            <div class="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg">
+                                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-800">${log.nama} (${log.noRumah})</p>
+                                <p class="text-[10px] text-slate-400">${formatDateTime(log.timestamp)} • ${log.officer}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-xs font-bold text-slate-800">${log.nama}</p>
-                            <p class="text-[10px] text-slate-400">${log.timestamp} • Petugas: ${log.officer}</p>
-                        </div>
-                    </div>
-                    <span class="text-xs font-bold text-emerald-600">+Rp ${Number(log.nominal).toLocaleString('id-ID')}</span>
-                </div>
-            `).join('');
+                        <span class="font-extrabold text-emerald-600">+${formatRupiah(log.nominal)}</span>
+                    `;
+                    recentLogsContainer.appendChild(el);
+                });
+                lucide.createIcons();
+            }
         }
 
-        function renderChart() {
+        // Chart Initialization
+        function initChart() {
             const ctx = document.getElementById('chartJimpitan').getContext('2d');
-            const labels = [];
-            const dataValues = [];
-
-            for (let i = 6; i >= 0; i--) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
-                const dateStr = d.toISOString().split('T')[0];
-                labels.push(d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' }));
-
-                const totalForDay = logsList
-                    .filter(log => log.timestamp.startsWith(dateStr))
-                    .reduce((sum, log) => sum + Number(log.nominal), 0);
-                dataValues.push(totalForDay);
-            }
-
-            if (chartInstance) chartInstance.destroy();
+            const { labels, data } = get7DaysData();
 
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Perolehan Jimpitan (Rp)',
-                        data: dataValues,
+                        label: 'Total Setoran (Rp)',
+                        data: data,
                         backgroundColor: '#22c55e',
-                        borderRadius: 8
+                        borderRadius: 8,
+                        hoverBackgroundColor: '#16a34a'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: {
+                        legend: { display: false }
+                    },
                     scales: {
-                        y: { beginAtZero: true, ticks: { font: { size: 10 } } },
-                        x: { ticks: { font: { size: 10 } } }
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => 'Rp ' + value.toLocaleString('id-ID')
+                            }
+                        }
                     }
                 }
             });
         }
 
-        // --- SCANNER & TRANSAKSI ---
-        function populateScanDropdown() {
-            const select = document.getElementById('selectSimulateWarga');
-            select.innerHTML = '<option value="">-- Pilih Warga / Rumah --</option>' +
-                wargaList.map(w => `<option value="${w.id}">${w.noRumah} - ${w.nama}</option>`).join('');
+        function updateChartData() {
+            if (!chartInstance) return;
+            const { labels, data } = get7DaysData();
+            chartInstance.data.labels = labels;
+            chartInstance.data.datasets[0].data = data;
+            chartInstance.update();
         }
 
-        function processPayment(wargaId) {
-            const warga = wargaList.find(w => w.id === wargaId);
-            if (!warga) {
-                Swal.fire({ icon: 'error', title: 'Data Warga Tidak Ditemukan!' });
-                return;
+        function get7DaysData() {
+            const labels = [];
+            const data = [];
+
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(Date.now() - i * 86400000);
+                const dateStr = d.toISOString().split('T')[0];
+                const dayLabel = d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' });
+
+                const sum = logsList
+                    .filter(log => log.timestamp.startsWith(dateStr))
+                    .reduce((acc, log) => acc + log.nominal, 0);
+
+                labels.push(dayLabel);
+                data.push(sum);
             }
-
-            const today = new Date().toISOString().split('T')[0];
-            const alreadyPaid = logsList.some(log => log.wargaId === wargaId && log.timestamp.startsWith(today));
-
-            if (alreadyPaid) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Sudah Setor Hari Ini!',
-                    text: `${warga.nama} (${warga.noRumah}) telah mencatat setoran untuk hari ini.`
-                });
-                return;
-            }
-
-            const nominalInput = document.getElementById('scanNominalInput').value || 2000;
-            const now = new Date();
-            const timeStr = `${now.toISOString().split('T')[0]} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-
-            const newLog = {
-                id: `TRX-${Date.now().toString().slice(-6)}`,
-                wargaId: warga.id,
-                noRumah: warga.noRumah,
-                nama: warga.nama,
-                nominal: Number(nominalInput),
-                timestamp: timeStr,
-                officer: currentOfficer || 'Petugas Lapangan'
-            };
-
-            logsList.push(newLog);
-            saveData();
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Setoran Berhasil!',
-                html: `<b>${warga.nama}</b> (${warga.noRumah})<br>Nominal: <b>Rp ${Number(nominalInput).toLocaleString('id-ID')}</b>`,
-                timer: 2000,
-                showConfirmButton: false
-            });
+            return { labels, data };
         }
 
-        function simulateScanFromSelect() {
-            const val = document.getElementById('selectSimulateWarga').value;
-            if (!val) {
-                Swal.fire({ icon: 'info', title: 'Pilih Warga Terlebih Dahulu' });
-                return;
-            }
-            processPayment(val);
-        }
-
-        function startScanner() {
-            document.getElementById('btnStartScan').disabled = true;
-            document.getElementById('btnStopScan').disabled = false;
-
-            html5QrcodeScanner = new Html5Qrcode("qr-reader");
-            html5QrcodeScanner.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 220, height: 220 } },
-                (decodedText) => {
-                    processPayment(decodedText);
-                    stopScanner();
-                },
-                (errorMessage) => { /* ignore frame errors */ }
-            ).catch(err => {
-                Swal.fire({ icon: 'error', title: 'Gagal Membuka Kamera', text: err });
-                stopScanner();
-            });
-        }
-
-        function stopScanner() {
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.stop().then(() => {
-                    html5QrcodeScanner.clear();
-                    html5QrcodeScanner = null;
-                }).catch(() => {});
-            }
-            document.getElementById('btnStartScan').disabled = false;
-            document.getElementById('btnStopScan').disabled = true;
-        }
-
-        // --- WARGA MANAGEMENT ---
+        // --- DATA WARGA MANAGEMENT ---
         function renderWargaTable() {
             const tbody = document.getElementById('tableWargaBody');
             const search = document.getElementById('searchWarga').value.toLowerCase();
-            const filter = document.getElementById('filterStatus').value;
-            const today = new Date().toISOString().split('T')[0];
+            const filterStatus = document.getElementById('filterStatus').value;
+
+            const todayPaidSet = new Set(logsList.filter(l => l.timestamp.startsWith(todayStr)).map(l => l.wargaId));
+
+            tbody.innerHTML = '';
 
             const filtered = wargaList.filter(w => {
-                const matchSearch = w.nama.toLowerCase().includes(search) ||
-                                    w.noRumah.toLowerCase().includes(search) ||
-                                    w.id.toLowerCase().includes(search);
-
-                const isPaid = logsList.some(log => log.wargaId === w.id && log.timestamp.startsWith(today));
-
-                if (filter === 'PAID') return matchSearch && isPaid;
-                if (filter === 'UNPAID') return matchSearch && !isPaid;
-                return matchSearch;
+                const matchesSearch = w.nama.toLowerCase().includes(search) || 
+                                      w.noRumah.toLowerCase().includes(search) || 
+                                      w.id.toLowerCase().includes(search);
+                
+                const isPaid = todayPaidSet.has(w.id);
+                if (filterStatus === 'PAID') return matchesSearch && isPaid;
+                if (filterStatus === 'UNPAID') return matchesSearch && !isPaid;
+                return matchesSearch;
             });
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-5 py-4 text-center text-slate-400">Data warga tidak ditemukan.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="px-5 py-6 text-center text-slate-400">Data warga tidak ditemukan.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = filtered.map(w => {
-                const isPaid = logsList.some(log => log.wargaId === w.id && log.timestamp.startsWith(today));
-                const statusBadge = isPaid
-                    ? `<span class="bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1 rounded-full text-xs">Sudah Bayar</span>`
-                    : `<span class="bg-rose-100 text-rose-700 font-semibold px-2.5 py-1 rounded-full text-xs">Belum Bayar</span>`;
-
-                return `
-                    <tr class="hover:bg-slate-50">
-                        <td class="px-5 py-3.5 font-bold text-slate-800">${w.noRumah} <span class="text-xs text-slate-400 block font-normal">${w.id}</span></td>
-                        <td class="px-5 py-3.5 font-medium">${w.nama}</td>
-                        <td class="px-5 py-3.5">RT ${w.rt} / RW ${w.rw}</td>
-                        <td class="px-5 py-3.5">${statusBadge}</td>
-                        <td class="px-5 py-3.5 text-center">
-                            <button onclick="showQRModal('${w.id}')" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition">
-                                <i data-lucide="qr-code" class="w-4 h-4"></i>
-                            </button>
-                        </td>
-                        <td class="px-5 py-3.5 text-right space-x-1">
-                            <button onclick="editWarga('${w.id}')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition"><i data-lucide="edit" class="w-4 h-4"></i></button>
-                            <button onclick="deleteWarga('${w.id}')" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                        </td>
-                    </tr>
+            filtered.forEach(w => {
+                const isPaidToday = todayPaidSet.has(w.id);
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/80 transition';
+                tr.innerHTML = `
+                    <td class="px-5 py-3.5 font-bold text-slate-800">${w.noRumah} <span class="block text-[10px] text-slate-400 font-mono font-normal">${w.id}</span></td>
+                    <td class="px-5 py-3.5 font-medium text-slate-800">${w.nama}</td>
+                    <td class="px-5 py-3.5 text-slate-500">RT ${w.rt} / RW ${w.rw}</td>
+                    <td class="px-5 py-3.5">
+                        ${isPaidToday 
+                            ? `<span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-semibold"><i data-lucide="check-circle" class="w-3 h-3 text-emerald-600"></i> Sudah Setor</span>`
+                            : `<span class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 text-xs px-2.5 py-1 rounded-full font-semibold"><i data-lucide="clock" class="w-3 h-3 text-amber-600"></i> Belum Setor</span>`
+                        }
+                    </td>
+                    <td class="px-5 py-3.5 text-center">
+                        <button onclick="openQRModal('${w.id}')" class="p-2 bg-slate-100 hover:bg-brand-50 hover:text-brand-600 text-slate-600 rounded-xl transition inline-flex items-center justify-center">
+                            <i data-lucide="qr-code" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                    <td class="px-5 py-3.5 text-right space-x-1">
+                        <button onclick="quickPay('${w.id}')" title="Setor Jimpitan Langsung" class="p-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg transition">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="openWargaModal('${w.id}')" title="Edit Data" class="p-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg transition">
+                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deleteWarga('${w.id}')" title="Hapus Warga" class="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg transition">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
                 `;
-            }).join('');
-
+                tbody.appendChild(tr);
+            });
             lucide.createIcons();
         }
 
-        function openWargaModal() {
-            document.getElementById('formWarga').reset();
+        // Modal Form Handlers
+        function openWargaModal(id = null) {
+            const modal = document.getElementById('modalWarga');
+            const title = document.getElementById('modalWargaTitle');
+            const form = document.getElementById('formWarga');
+
+            form.reset();
             document.getElementById('wargaId').value = '';
-            document.getElementById('modalWargaTitle').innerText = 'Tambah Data Warga Baru';
-            document.getElementById('modalWarga').classList.remove('hidden');
+
+            if (id) {
+                const w = wargaList.find(item => item.id === id);
+                if (w) {
+                    title.innerText = 'Edit Data Warga';
+                    document.getElementById('wargaId').value = w.id;
+                    document.getElementById('wargaNoRumah').value = w.noRumah;
+                    document.getElementById('wargaNama').value = w.nama;
+                    document.getElementById('wargaRT').value = w.rt;
+                    document.getElementById('wargaRW').value = w.rw;
+                    document.getElementById('wargaPhone').value = w.phone || '';
+                }
+            } else {
+                title.innerText = 'Tambah Data Warga Baru';
+                document.getElementById('wargaRT').value = '08';
+                document.getElementById('wargaRW').value = '03';
+            }
+
+            modal.classList.remove('hidden');
         }
 
         function closeWargaModal() {
             document.getElementById('modalWarga').classList.add('hidden');
         }
 
-        function saveWarga(e) {
-            e.preventDefault();
+        function saveWarga(event) {
+            event.preventDefault();
             const id = document.getElementById('wargaId').value;
             const noRumah = document.getElementById('wargaNoRumah').value.trim();
             const nama = document.getElementById('wargaNama').value.trim();
-            const rt = document.getElementById('wargaRT').value.trim() || '08';
-            const rw = document.getElementById('wargaRW').value.trim() || '03';
+            const rt = document.getElementById('wargaRT').value.trim();
+            const rw = document.getElementById('wargaRW').value.trim();
             const phone = document.getElementById('wargaPhone').value.trim();
 
             if (id) {
-                const idx = wargaList.findIndex(w => w.id === id);
-                if (idx !== -1) {
-                    wargaList[idx] = { id, noRumah, nama, rt, rw, phone };
+                // Update
+                const index = wargaList.findIndex(w => w.id === id);
+                if (index !== -1) {
+                    wargaList[index] = { ...wargaList[index], noRumah, nama, rt, rw, phone };
                 }
             } else {
-                const newId = `JMP-${Math.floor(100 + Math.random() * 900)}`;
+                // Create
+                const newId = 'JMP-' + Math.floor(100 + Math.random() * 900);
                 wargaList.push({ id: newId, noRumah, nama, rt, rw, phone });
             }
 
             saveData();
             closeWargaModal();
             renderWargaTable();
-            Swal.fire({ icon: 'success', title: 'Data warga berhasil disimpan!', timer: 1200, showConfirmButton: false });
-        }
-
-        function editWarga(id) {
-            const w = wargaList.find(item => item.id === id);
-            if (!w) return;
-
-            document.getElementById('wargaId').value = w.id;
-            document.getElementById('wargaNoRumah').value = w.noRumah;
-            document.getElementById('wargaNama').value = w.nama;
-            document.getElementById('wargaRT').value = w.rt;
-            document.getElementById('wargaRW').value = w.rw;
-            document.getElementById('wargaPhone').value = w.phone || '';
-
-            document.getElementById('modalWargaTitle').innerText = 'Edit Data Warga';
-            document.getElementById('modalWarga').classList.remove('hidden');
+            populateSimulateSelect();
+            Toast.fire({ icon: 'success', title: 'Data warga berhasil disimpan!' });
         }
 
         function deleteWarga(id) {
             Swal.fire({
-                title: 'Hapus Warga ini?',
-                text: 'Data yang dihapus tidak dapat dikembalikan!',
+                title: 'Hapus Data Warga?',
+                text: "Data warga yang dihapus tidak bisa dikembalikan!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#e11d48',
+                confirmButtonColor: '#ef4444',
+                cancelButtonText: 'Batal',
                 confirmButtonText: 'Ya, Hapus'
-            }).then(result => {
+            }).then((result) => {
                 if (result.isConfirmed) {
                     wargaList = wargaList.filter(w => w.id !== id);
                     saveData();
                     renderWargaTable();
-                    Swal.fire({ icon: 'success', title: 'Terhapus!', timer: 1200, showConfirmButton: false });
+                    populateSimulateSelect();
+                    Toast.fire({ icon: 'success', title: 'Data warga berhasil dihapus.' });
                 }
             });
         }
 
-        // --- QR MODAL & CETAK ---
-        function showQRModal(id) {
-            const w = wargaList.find(item => item.id === id);
-            if (!w) return;
+        // Quick payment direct from table
+        function quickPay(wargaId) {
+            const nominal = parseInt(document.getElementById('scanNominalInput').value) || 2000;
+            processJimpitanPayment(wargaId, nominal);
+        }
 
-            document.getElementById('qrModalNama').innerText = w.nama;
-            document.getElementById('qrModalNoRumah').innerText = `Rumah No. ${w.noRumah} (RT ${w.rt}/RW ${w.rw})`;
-            document.getElementById('qrModalID').innerText = `ID: ${w.id}`;
+        // --- QR CODE GENERATOR & MODAL ---
+        function openQRModal(id) {
+            const warga = wargaList.find(w => w.id === id);
+            if (!warga) return;
+
+            document.getElementById('qrModalNama').innerText = warga.nama;
+            document.getElementById('qrModalNoRumah').innerText = `No. Rumah: ${warga.noRumah} (RT ${warga.rt}/RW ${warga.rw})`;
+            document.getElementById('qrModalID').innerText = `ID: ${warga.id}`;
 
             const container = document.getElementById('qrcodeContainer');
             container.innerHTML = '';
+
+            // Encapsulate data payload into JSON for scanner reading
+            const qrPayload = JSON.stringify({
+                id: warga.id,
+                noRumah: warga.noRumah,
+                nama: warga.nama
+            });
+
             new QRCode(container, {
-                text: w.id,
+                text: qrPayload,
                 width: 160,
-                height: 160
+                height: 160,
+                colorDark: "#15803d",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
             });
 
             document.getElementById('modalQR').classList.remove('hidden');
@@ -860,100 +896,428 @@
         }
 
         function printSingleQR() {
-            const content = document.getElementById('printableCard').innerHTML;
-            document.getElementById('printContent').innerHTML = `<div class="flex justify-center p-8">${content}</div>`;
-            window.print();
+            const printCard = document.getElementById('printableCard').outerHTML;
+            const printWin = window.open('', '_blank');
+            printWin.document.write(`
+                <html>
+                <head>
+                    <title>Cetak QR Code Jimpitan</title>
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <style>
+                        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
+                    </style>
+                </head>
+                <body onload="window.print(); window.close();">
+                    <div class="w-80 border-2 border-black p-6 rounded-2xl text-center">
+                        ${printCard}
+                    </div>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
         }
 
-        // --- RIWAYAT & REKAP LOGS ---
-        function renderHistoryTable() {
-            const tbody = document.getElementById('tableHistoryBody');
-            const startDate = document.getElementById('filterStartDate').value;
-            const endDate = document.getElementById('filterEndDate').value;
-            const search = document.getElementById('searchHistory').value.toLowerCase();
+        // --- QR CAMERA SCANNER SYSTEM ---
+        function startScanner() {
+            document.getElementById('btnStartScan').disabled = true;
+            document.getElementById('btnStopScan').disabled = false;
 
-            const filtered = logsList.filter(log => {
-                const dateOnly = log.timestamp.split(' ')[0];
-                const matchStart = startDate ? dateOnly >= startDate : true;
-                const matchEnd = endDate ? dateOnly <= endDate : true;
-                const matchSearch = log.nama.toLowerCase().includes(search) ||
-                                    log.officer.toLowerCase().includes(search) ||
-                                    log.noRumah.toLowerCase().includes(search);
+            html5QrcodeScanner = new Html5Qrcode("qr-reader");
 
-                return matchStart && matchEnd && matchSearch;
+            const config = { fps: 10, qrbox: { width: 220, height: 220 } };
+
+            html5QrcodeScanner.start(
+                { facingMode: "environment" },
+                config,
+                onScanSuccess,
+                onScanFailure
+            ).catch(err => {
+                console.warn("Kamera tidak dapat diakses: ", err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kamera Tidak Tersedia',
+                    text: 'Pastikan memberikan izin akses kamera atau gunakan modul simulasi scan manual di bawah.'
+                });
+                stopScanner();
             });
+        }
 
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-5 py-4 text-center text-slate-400">Tidak ada riwayat transaksi.</td></tr>`;
+        function stopScanner() {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.stop().then(() => {
+                    html5QrcodeScanner.clear();
+                    document.getElementById('btnStartScan').disabled = false;
+                    document.getElementById('btnStopScan').disabled = true;
+                }).catch(err => console.error(err));
+            } else {
+                document.getElementById('btnStartScan').disabled = false;
+                document.getElementById('btnStopScan').disabled = true;
+            }
+        }
+
+        function onScanSuccess(decodedText) {
+            try {
+                // Try JSON parse payload first
+                let parsed = null;
+                try {
+                    parsed = JSON.parse(decodedText);
+                } catch(e) {
+                    // Fallback if payload is raw ID string
+                    parsed = { id: decodedText };
+                }
+
+                if (parsed && parsed.id) {
+                    const nominal = parseInt(document.getElementById('scanNominalInput').value) || 2000;
+                    processJimpitanPayment(parsed.id, nominal);
+                    
+                    // Beep Feedback Audio
+                    playBeepSound();
+                    
+                    // Pause scanner briefly to avoid double scan
+                    html5QrcodeScanner.pause(true);
+                    setTimeout(() => {
+                        if (html5QrcodeScanner) html5QrcodeScanner.resume();
+                    }, 2500);
+                } else {
+                    Toast.fire({ icon: 'warning', title: 'Format QR Code tidak terdeteksi!' });
+                }
+            } catch (err) {
+                Toast.fire({ icon: 'error', title: 'QR Code tidak valid!' });
+            }
+        }
+
+        function onScanFailure(error) {
+            // Quiet fail during continuous scan frame check
+        }
+
+        // Simulate selection setup
+        function populateSimulateSelect() {
+            const select = document.getElementById('selectSimulateWarga');
+            select.innerHTML = '<option value="">-- Pilih Warga / Rumah --</option>';
+
+            wargaList.forEach(w => {
+                const opt = document.createElement('option');
+                opt.value = w.id;
+                opt.textContent = `${w.noRumah} - ${w.nama}`;
+                select.appendChild(opt);
+            });
+        }
+
+        function simulateScanFromSelect() {
+            const wargaId = document.getElementById('selectSimulateWarga').value;
+            if (!wargaId) {
+                Swal.fire('Pilih Warga', 'Silakan pilih nama warga dari dropdown simulasi.', 'warning');
+                return;
+            }
+            const nominal = parseInt(document.getElementById('scanNominalInput').value) || 2000;
+            processJimpitanPayment(wargaId, nominal);
+        }
+
+        // --- PAYMENT & TRANSACTION LOGIC ---
+        function processJimpitanPayment(wargaId, nominal) {
+            const warga = wargaList.find(w => w.id === wargaId);
+            if (!warga) {
+                Swal.fire('Error', 'Data warga tidak ditemukan di sistem!', 'error');
                 return;
             }
 
-            tbody.innerHTML = [...filtered].reverse().map(log => `
-                <tr class="hover:bg-slate-50">
-                    <td class="px-5 py-3.5 font-mono text-xs text-slate-500">${log.timestamp}</td>
-                    <td class="px-5 py-3.5 font-bold text-slate-800">${log.nama} <span class="text-xs text-slate-400 block font-normal">${log.wargaId}</span></td>
-                    <td class="px-5 py-3.5">${log.noRumah}</td>
-                    <td class="px-5 py-3.5 font-bold text-emerald-600">Rp ${Number(log.nominal).toLocaleString('id-ID')}</td>
-                    <td class="px-5 py-3.5">${log.officer}</td>
-                    <td class="px-5 py-3.5 text-right">
-                        <button onclick="deleteLog('${log.id}')" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </td>
-                </tr>
-            `).join('');
+            const now = new Date();
+            const timestampStr = `${now.toISOString().split('T')[0]} ${now.toTimeString().split(' ')[0]}`;
 
+            const newTransaction = {
+                id: 'TRX-' + Date.now().toString().slice(-5),
+                wargaId: warga.id,
+                noRumah: warga.noRumah,
+                nama: warga.nama,
+                nominal: nominal,
+                timestamp: timestampStr,
+                officer: currentOfficer
+            };
+
+            logsList.push(newTransaction);
+            saveData();
+            updateDashboardStats();
+            renderWargaTable();
+            renderHistoryTable();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Setoran Berhasil!',
+                html: `
+                    <div class="text-center space-y-1 mt-2">
+                        <p class="text-sm font-semibold text-slate-700">${warga.nama} (${warga.noRumah})</p>
+                        <p class="text-2xl font-extrabold text-emerald-600">${formatRupiah(nominal)}</p>
+                        <p class="text-xs text-slate-400">Petugas: ${currentOfficer}</p>
+                    </div>
+                `,
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+
+        // Audio Feedback function
+        function playBeepSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = "sine";
+                osc.frequency.value = 880; // A5 pitch
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.15);
+            } catch (e) {
+                // Ignore audio error if context restricted
+            }
+        }
+
+        // --- HISTORY & REPORT TABLE ---
+        function renderHistoryTable() {
+            const tbody = document.getElementById('tableHistoryBody');
+            const search = document.getElementById('searchHistory').value.toLowerCase();
+            const startDate = document.getElementById('filterStartDate').value;
+            const endDate = document.getElementById('filterEndDate').value;
+
+            tbody.innerHTML = '';
+
+            const filtered = logsList.filter(log => {
+                const datePart = log.timestamp.split(' ')[0];
+                const inDateRange = (!startDate || datePart >= startDate) && (!endDate || datePart <= endDate);
+                const matchesSearch = log.nama.toLowerCase().includes(search) || 
+                                      log.noRumah.toLowerCase().includes(search) || 
+                                      log.officer.toLowerCase().includes(search);
+                return inDateRange && matchesSearch;
+            }).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-5 py-6 text-center text-slate-400">Tidak ada catatan transaksi jimpitan.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                tr.innerHTML = `
+                    <td class="px-5 py-3.5 text-xs font-semibold text-slate-600">${formatDateTime(log.timestamp)}</td>
+                    <td class="px-5 py-3.5 font-bold text-slate-800">${log.nama} <span class="block text-[10px] text-slate-400 font-mono font-normal">${log.wargaId}</span></td>
+                    <td class="px-5 py-3.5 text-slate-600 font-medium">${log.noRumah}</td>
+                    <td class="px-5 py-3.5 font-extrabold text-emerald-600">${formatRupiah(log.nominal)}</td>
+                    <td class="px-5 py-3.5 text-xs text-slate-500">${log.officer}</td>
+                    <td class="px-5 py-3.5 text-right">
+                        <button onclick="deleteLog('${log.id}')" title="Hapus Log" class="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg transition">
+                            <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
             lucide.createIcons();
         }
 
         function deleteLog(logId) {
             Swal.fire({
-                title: 'Batalkan / Hapus Setoran ini?',
+                title: 'Batalkan Setoran Ini?',
+                text: "Saldo transaksi akan dikurangkan kembali.",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#e11d48',
-                confirmButtonText: 'Hapus'
-            }).then(res => {
-                if (res.isConfirmed) {
+                confirmButtonColor: '#ef4444',
+                cancelButtonText: 'Batal',
+                confirmButtonText: 'Ya, Batalkan'
+            }).then((result) => {
+                if (result.isConfirmed) {
                     logsList = logsList.filter(l => l.id !== logId);
                     saveData();
+                    updateDashboardStats();
+                    renderWargaTable();
                     renderHistoryTable();
-                    Swal.fire({ icon: 'success', title: 'Transaksi Dihapus', timer: 1200, showConfirmButton: false });
+                    Toast.fire({ icon: 'success', title: 'Setoran berhasil dibatalkan.' });
                 }
             });
         }
 
+        // EXPORT TO CSV
         function exportToCSV() {
             if (logsList.length === 0) {
-                Swal.fire({ icon: 'info', title: 'Tidak ada data untuk diexport' });
+                Swal.fire('Data Kosong', 'Belum ada data transaksi untuk diexport.', 'info');
                 return;
             }
 
-            let csvContent = "data:text/csv;charset=utf-8,ID TRX,Tanggal Waktu,ID Warga,No Rumah,Nama Warga,Nominal,Petugas\n";
-            logsList.forEach(log => {
-                csvContent += `"${log.id}","${log.timestamp}","${log.wargaId}","${log.noRumah}","${log.nama}",${log.nominal},"${log.officer}"\n`;
+            let csvContent = "data:text/csv;charset=utf-8,ID Transaksi,ID Warga,No Rumah,Nama Warga,Nominal,Waktu,Petugas Kartar\n";
+            logsList.forEach(l => {
+                csvContent += `"${l.id}","${l.wargaId}","${l.noRumah}","${l.nama}",${l.nominal},"${l.timestamp}","${l.officer}"\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `rekap_jimpitan_${new Date().toISOString().split('T')[0]}.csv`);
+            link.setAttribute("download", `Rekap_Jimpitan_RT08_09_${todayStr}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
 
-        // --- INIT APPLICATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
+        // --- UTILITY FORMATTERS ---
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+        }
 
-            if (currentOfficer) {
-                document.getElementById('currentOfficerName').innerText = currentOfficer;
-                document.getElementById('loginScreen').classList.add('hidden');
-            } else {
-                document.getElementById('loginScreen').classList.remove('hidden');
-            }
+        function formatDateTime(dateTimeStr) {
+            if (!dateTimeStr) return '-';
+            const [datePart, timePart] = dateTimeStr.split(' ');
+            const [y, m, d] = datePart.split('-');
+            return `${d}/${m}/${y} ${timePart || ''}`;
+        }
 
-            updateDashboard();
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
         });
+        const daftarWarga = [
+  { nama: "Budi Santoso", rt: "08", rw: "03" },
+  { nama: "Siti Aminah", rt: "08", rw: "03" },
+  { nama: "Joko Widodo", rt: "09", rw: "03" },
+  { nama: "Ahmad Dahlan", rt: "09", rw: "03" }
+];
+
+// Fungsi untuk menampilkan ke tabel/daftar di web
+function tampilkanWarga() {
+  const container = document.getElementById('listWarga');
+  container.innerHTML = daftarWarga.map(warga => `
+    <div class="p-2 border-b">
+      <p class="font-bold">${warga.nama}</p>
+      <p class="text-sm text-gray-600">RT ${warga.rt} / RW ${warga.rw}</p>
+    </div>
+  `).join('');
+}
+
+// Jalankan fungsi saat halaman dimuat
+document.addEventListener('DOMContentLoaded', tampilkanWarga);
+        // --- DATA AKUN PENGURUS & PETUGAS KARANG TARUNA GEBANG KELOPO ---
+        const AUTHORIZED_USERS = [
+            { username: "ketua", password: "kt1", name: "Ketua Karang Taruna" },
+            { username: "wakil", password: "kt2", name: "Wakil Ketua" },
+            { username: "bendahara1", password: "b1", name: "Bendahara 1" },
+            { username: "bendahara2", password: "b2", name: "Bendahara 2" },
+            { username: "sekretaris1", password: "s1", name: "Sekretaris 1" },
+            { username: "sekretaris2", password: "s2", name: "Sekretaris 2" },
+            { username: "petugas01", password: "p01", name: "Petugas Piket RT 08" },
+            { username: "petugas02", password: "p02", name: "Petugas Piket RT 09" }
+        ];
+
+        // Key Penyimpanan Session Login
+        const STORAGE_KEY_AUTH = 'ejimpitan_auth_session';
+
+        // --- CEK STATUS LOGIN SAAT WEB DIBUKA ---
+        function checkAuthSession() {
+            const savedSession = localStorage.getItem(STORAGE_KEY_AUTH);
+            const modalLogin = document.getElementById('modalLogin');
+
+            if (savedSession) {
+                const user = JSON.parse(savedSession);
+                currentOfficer = user.name;
+                document.getElementById('currentOfficerName').textContent = currentOfficer;
+                if (modalLogin) modalLogin.classList.add('hidden');
+            } else {
+                if (modalLogin) modalLogin.classList.remove('hidden');
+            }
+        }
+
+        // --- PROSES LOGIN ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const usernameInput = document.getElementById('loginUsername').value.trim();
+            const passwordInput = document.getElementById('loginPassword').value.trim();
+
+            // Cari pendaftaran akun yang cocok
+            const userMatch = AUTHORIZED_USERS.find(
+                u => u.username.toLowerCase() === usernameInput.toLowerCase() && u.password === passwordInput
+            );
+
+            if (userMatch) {
+                // Simpan Sesi Login
+                localStorage.setItem(STORAGE_KEY_AUTH, JSON.stringify(userMatch));
+                currentOfficer = userMatch.name;
+                document.getElementById('currentOfficerName').textContent = currentOfficer;
+
+                // Sembunyikan Modal Login
+                document.getElementById('modalLogin').classList.add('hidden');
+                document.getElementById('formLogin').reset();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Berhasil',
+                    text: `Selamat bertugas, ${userMatch.name}!`,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+
+                // Re-render UI
+                renderDashboard();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Akses Ditolak',
+                    text: 'Username atau Password salah! Akses khusus petugas terdaftar.',
+                    confirmButtonColor: '#ef4444'
+                });
+            }
+        }
+
+        // --- LOGOUT / KELUAR ---
+        function logoutOfficer() {
+            Swal.fire({
+                title: 'Keluar Sistem?',
+                text: 'Sesi petugas akan diakhiri.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Keluar',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem(STORAGE_KEY_AUTH);
+                    document.getElementById('modalLogin').classList.remove('hidden');
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Berhasil Keluar',
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
     </script>
+    <!-- MODAL LOGIN / AUTENTIKASI PETUGAS -->
+<div id="modalLogin" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-100">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-brand-100 text-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                <i data-lucide="lock" class="w-8 h-8"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800">Akses Terbatas Petugas</h2>
+            <p class="text-xs text-slate-500 mt-1">Silakan login menggunakan akun petugas Karang Taruna Gebang Kelopo</p>
+        </div>
+
+        <form id="formLogin" onsubmit="handleLogin(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Username / ID Petugas</label>
+                <input type="text" id="loginUsername" required placeholder="Masukkan username" class="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Password</label>
+                <input type="password" id="loginPassword" required placeholder="Masukkan password" class="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+            <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl text-sm transition shadow-lg shadow-brand-500/30">
+                Masuk Sistem
+            </button>
+        </form>
+    </div>
+</div>
 </body>
 </html>
