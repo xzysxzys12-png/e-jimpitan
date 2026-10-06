@@ -1,1096 +1,3081 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full bg-slate-50">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>E-Jimpitan Digital RT 08 & 09 / RW 03 - Dusun Gebang Kelopo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50:'#f0fdf4',100:'#dcfce7',200:'#bbf7d0',300:'#86efac',
-              400:'#4ade80',500:'#22c55e',600:'#16a34a',700:'#15803d',
-              800:'#166534',900:'#14532d'
-            }
-          }
+    <title>E-Jimpitan Digital RT 08 & 09 / RW 03</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
         }
-      }
-    };
-  </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <style>
-    body{font-family:'Plus Jakarta Sans',sans-serif}
-    .scrollbar-none::-webkit-scrollbar{display:none}
-    .scrollbar-none{scrollbar-width:none}
-    @media print{
-      .no-print{display:none!important}
-      .print-only{display:block!important}
-      body{background:#fff!important}
-    }
-    .print-only{display:none}
-    #qr-reader video{border-radius:12px!important}
-    #qr-reader__scan_region{min-height:260px}
-    #qr-reader__dashboard_section_csr button{border:0!important;border-radius:10px!important;padding:8px 12px!important}
-  </style>
+        .hidden {
+            display: none !important;
+        }
+
+        .modal-bg {
+            background: rgba(15, 23, 42, 0.65);
+        }
+
+        table th,
+        table td {
+            white-space: nowrap;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background: white !important;
+            }
+        }
+    </style>
 </head>
 
-<body class="h-full flex flex-col antialiased text-slate-800">
+<body class="bg-slate-100 min-h-screen">
 
-<header class="bg-brand-700 text-white sticky top-0 z-30 shadow-md no-print">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
-      <div class="flex items-center gap-3">
-        <div class="bg-white/10 p-2 rounded-xl">
-          <i data-lucide="coins" class="w-6 h-6 text-emerald-300"></i>
-        </div>
-        <div>
-          <h1 class="font-bold text-lg leading-tight">E-Jimpitan Digital</h1>
-          <p class="text-xs text-brand-100">RT 08 & 09 / RW 03 Dusun Gebang Kelopo</p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <div class="hidden sm:flex items-center gap-3 bg-brand-800/50 px-3 py-1.5 rounded-lg border border-brand-600">
-          <i data-lucide="user-check" class="w-4 h-4 text-emerald-300"></i>
-          <div class="text-xs">
-            <span class="block text-brand-200 text-[10px] uppercase font-semibold">Petugas</span>
-            <span id="currentOfficerName" class="font-semibold text-white">-</span>
-          </div>
-          <button onclick="changeOfficer()" class="text-xs bg-brand-600 hover:bg-brand-500 px-2 py-1 rounded">Ganti</button>
-        </div>
-        <button onclick="logoutOfficer()" class="p-2 rounded-lg bg-white/10 hover:bg-white/20" title="Keluar">
-          <i data-lucide="log-out" class="w-4 h-4"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-</header>
-
-<nav class="bg-white border-b border-slate-200 sticky top-16 z-20 shadow-sm no-print">
-  <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-    <div class="flex gap-1 sm:gap-4 overflow-x-auto py-2 scrollbar-none">
-      <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-tab active flex items-center gap-2 px-3 py-2 text-sm font-semibold rounded-lg bg-brand-50 text-brand-700 whitespace-nowrap">
-        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard
-      </button>
-      <button onclick="switchTab('scan')" id="tab-scan" class="nav-tab flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 whitespace-nowrap">
-        <i data-lucide="qr-code" class="w-4 h-4"></i>Scan Jimpitan
-      </button>
-      <button onclick="switchTab('warga')" id="tab-warga" class="nav-tab flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 whitespace-nowrap">
-        <i data-lucide="users" class="w-4 h-4"></i>Data Warga
-      </button>
-      <button onclick="switchTab('riwayat')" id="tab-riwayat" class="nav-tab flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-100 whitespace-nowrap">
-        <i data-lucide="history" class="w-4 h-4"></i>Riwayat & Rekap
-      </button>
-    </div>
-  </div>
-</nav>
-
-<main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 no-print">
-
-<section id="view-dashboard" class="space-y-6">
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center justify-between">
-      <div><p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Kas Jimpitan</p><h3 id="statTotalSaldo" class="text-2xl font-bold mt-1">Rp 0</h3><p class="text-xs text-emerald-600 mt-1">Terakumulasi</p></div>
-      <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl"><i data-lucide="wallet" class="w-6 h-6"></i></div>
-    </div>
-    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center justify-between">
-      <div><p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Setoran Hari Ini</p><h3 id="statTodayIncome" class="text-2xl font-bold mt-1">Rp 0</h3><p id="statTodayCount" class="text-xs text-slate-500 mt-1">0 rumah</p></div>
-      <div class="p-3 bg-blue-50 text-blue-600 rounded-xl"><i data-lucide="calendar" class="w-6 h-6"></i></div>
-    </div>
-    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center justify-between">
-      <div><p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Setoran Bulan Ini</p><h3 id="statMonthIncome" class="text-2xl font-bold mt-1">Rp 0</h3><p class="text-xs text-slate-500 mt-1">Periode berjalan</p></div>
-      <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl"><i data-lucide="circle-dollar-sign" class="w-6 h-6"></i></div>
-    </div>
-    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center justify-between">
-      <div><p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Rumah / Warga</p><h3 id="statTotalWarga" class="text-2xl font-bold mt-1">0 KK</h3><p id="statPaidTodayPercent" class="text-xs text-emerald-600 mt-1 font-medium">0% tercover hari ini</p></div>
-      <div class="p-3 bg-amber-50 text-amber-600 rounded-xl"><i data-lucide="home" class="w-6 h-6"></i></div>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-      <div class="flex items-center justify-between mb-4">
-        <div><h2 class="font-bold">Tren Setoran Jimpitan</h2><p class="text-xs text-slate-500">7 hari terakhir</p></div>
-        <span class="text-xs bg-slate-100 px-2.5 py-1 rounded-full">Harian</span>
-      </div>
-      <div class="w-full h-64"><canvas id="chartJimpitan"></canvas></div>
-    </div>
-
-    <div class="space-y-6">
-      <div class="bg-gradient-to-br from-brand-700 to-brand-800 text-white p-5 rounded-2xl shadow-md">
-        <span class="bg-brand-600/60 border border-brand-400 text-brand-100 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">Quick Action</span>
-        <h3 class="text-xl font-bold mt-2">Mulai Tugas Kartar</h3>
-        <p class="text-xs text-brand-100 mt-1">Gunakan HP/tablet untuk memindai QR warga saat keliling jimpitan.</p>
-        <button onclick="switchTab('scan')" class="mt-4 w-full bg-white text-brand-800 hover:bg-brand-50 font-bold py-2.5 rounded-xl flex items-center justify-center gap-2">
-          <i data-lucide="scan-line" class="w-5 h-5"></i>Buka Scanner
-        </button>
-      </div>
-
-      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-        <h3 class="font-bold text-sm mb-3 flex justify-between"><span>Aktivitas Terbaru</span><span class="text-xs text-slate-400 font-normal">Realtime</span></h3>
-        <div id="dashboardRecentLogs" class="space-y-3 max-h-56 overflow-y-auto"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="view-scan" class="hidden space-y-6">
-  <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-    <div class="p-5 border-b bg-slate-50/50 flex justify-between items-center">
-      <div><h2 class="font-bold flex items-center gap-2"><i data-lucide="scan" class="w-5 h-5 text-brand-600"></i>Scan QR Code Warga</h2><p class="text-xs text-slate-500">Arahkan kamera ke QR warga.</p></div>
-      <span class="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-semibold">Aktif</span>
-    </div>
-    <div class="p-5 space-y-4">
-      <div class="bg-slate-900 rounded-xl overflow-hidden min-h-[260px] flex items-center justify-center">
-        <div id="qr-reader" class="w-full"></div>
-      </div>
-
-      <div class="bg-brand-50/60 p-3.5 rounded-xl border border-brand-100 flex items-center justify-between">
-        <div><label class="block text-xs font-semibold text-brand-800">Nominal Jimpitan</label><p class="text-[11px] text-brand-600">Nominal default saat QR terdeteksi.</p></div>
-        <div class="flex items-center gap-1"><span class="text-xs font-bold">Rp</span><input type="number" id="scanNominalInput" value="2000" min="0" step="500" class="w-24 px-2 py-1 bg-white border border-brand-200 rounded-lg text-sm font-bold text-right"></div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-3">
-        <button id="btnStartScan" onclick="startScanner()" class="py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2"><i data-lucide="camera" class="w-4 h-4"></i>Buka Kamera</button>
-        <button id="btnStopScan" onclick="stopScanner()" disabled class="py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-sm rounded-xl flex items-center justify-center gap-2"><i data-lucide="camera-off" class="w-4 h-4"></i>Matikan Kamera</button>
-      </div>
-
-      <div class="pt-4 border-t">
-        <p class="text-xs font-semibold text-slate-600 mb-2">Simulasi Scan Manual (tanpa kamera)</p>
-        <div class="flex gap-2">
-          <select id="selectSimulateWarga" class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm"></select>
-          <button onclick="simulateScanFromSelect()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs sm:text-sm font-medium">Setor</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="view-warga" class="hidden space-y-6">
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border">
-    <div><h2 class="font-bold text-lg">Data Rumah & Warga RT 08 & 09</h2><p class="text-xs text-slate-500">Data penerima dan kupon QR jimpitan.</p></div>
-    <button onclick="openWargaModal()" class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center justify-center gap-2"><i data-lucide="user-plus" class="w-4 h-4"></i>Tambah Warga</button>
-  </div>
-
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-    <div class="sm:col-span-2 relative"><i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-slate-400"></i><input type="text" id="searchWarga" oninput="renderWargaTable()" placeholder="Cari nama, nomor rumah, atau ID..." class="w-full pl-10 pr-4 py-2 bg-white border rounded-xl text-sm"></div>
-    <select id="filterStatus" onchange="renderWargaTable()" class="w-full px-3 py-2 bg-white border rounded-xl text-sm">
-      <option value="ALL">Semua Status Hari Ini</option><option value="PAID">Sudah Bayar</option><option value="UNPAID">Belum Bayar</option>
-    </select>
-  </div>
-
-  <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="w-full text-left text-sm">
-        <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold border-b">
-          <tr><th class="px-5 py-3.5">ID / Rumah</th><th class="px-5 py-3.5">Nama KK</th><th class="px-5 py-3.5">RT / RW</th><th class="px-5 py-3.5">Status</th><th class="px-5 py-3.5 text-center">QR</th><th class="px-5 py-3.5 text-right">Aksi</th></tr>
-        </thead>
-        <tbody id="tableWargaBody" class="divide-y"></tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<section id="view-riwayat" class="hidden space-y-6">
-  <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
-      <div><h2 class="font-bold text-lg">Catatan & Rekap Jimpitan</h2><p class="text-xs text-slate-500">Histori dana jimpitan.</p></div>
-      <div class="flex gap-2">
-        <button onclick="exportToCSV()" class="bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i>Export CSV</button>
-        <button onclick="printReport()" class="bg-slate-100 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5"><i data-lucide="printer" class="w-4 h-4"></i>Cetak</button>
-      </div>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <div><label class="block text-xs font-semibold text-slate-500 mb-1">Tanggal Mulai</label><input type="date" id="filterStartDate" onchange="renderHistoryTable()" class="w-full px-3 py-2 bg-slate-50 border rounded-xl text-sm"></div>
-      <div><label class="block text-xs font-semibold text-slate-500 mb-1">Tanggal Akhir</label><input type="date" id="filterEndDate" onchange="renderHistoryTable()" class="w-full px-3 py-2 bg-slate-50 border rounded-xl text-sm"></div>
-      <div><label class="block text-xs font-semibold text-slate-500 mb-1">Cari</label><input type="text" id="searchHistory" oninput="renderHistoryTable()" placeholder="Nama / rumah / petugas..." class="w-full px-3 py-2 bg-slate-50 border rounded-xl text-sm"></div>
-    </div>
-  </div>
-
-  <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="w-full text-left text-sm">
-        <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold border-b">
-          <tr><th class="px-5 py-3.5">Waktu</th><th class="px-5 py-3.5">ID & Warga</th><th class="px-5 py-3.5">Rumah</th><th class="px-5 py-3.5">Nominal</th><th class="px-5 py-3.5">Petugas</th><th class="px-5 py-3.5 text-right">Aksi</th></tr>
-        </thead>
-        <tbody id="tableHistoryBody" class="divide-y"></tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-</main>
-
-<!-- MODAL WARGA -->
-<div id="modalWarga" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 no-print">
-  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
-    <div class="flex justify-between items-center border-b pb-3 mb-4"><h3 id="modalWargaTitle" class="font-bold text-lg">Tambah Data Warga</h3><button onclick="closeWargaModal()"><i data-lucide="x"></i></button></div>
-    <form id="formWarga" onsubmit="saveWarga(event)" class="space-y-3">
-      <input type="hidden" id="wargaId">
-      <div><label class="block text-xs font-semibold mb-1">Nomor Rumah / Kode KK *</label><input type="text" id="wargaNoRumah" required placeholder="A-12" class="w-full px-3 py-2 border rounded-xl text-sm"></div>
-      <div><label class="block text-xs font-semibold mb-1">Nama Kepala Keluarga *</label><input type="text" id="wargaNama" required placeholder="Nama warga" class="w-full px-3 py-2 border rounded-xl text-sm"></div>
-      <div class="grid grid-cols-2 gap-3"><div><label class="block text-xs font-semibold mb-1">RT</label><input type="text" id="wargaRT" value="08" class="w-full px-3 py-2 border rounded-xl text-sm"></div><div><label class="block text-xs font-semibold mb-1">RW</label><input type="text" id="wargaRW" value="03" class="w-full px-3 py-2 border rounded-xl text-sm"></div></div>
-      <div><label class="block text-xs font-semibold mb-1">No. HP / WhatsApp</label><input type="tel" id="wargaPhone" placeholder="08123456789" class="w-full px-3 py-2 border rounded-xl text-sm"></div>
-      <div class="pt-3 flex justify-end gap-2"><button type="button" onclick="closeWargaModal()" class="px-4 py-2 bg-slate-100 text-sm font-semibold rounded-xl">Batal</button><button type="submit" class="px-4 py-2 bg-brand-600 text-white text-sm font-semibold rounded-xl">Simpan</button></div>
-    </form>
-  </div>
-</div>
-
-<!-- MODAL QR -->
-<div id="modalQR" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 no-print">
-  <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl text-center">
-    <div class="flex justify-between items-center border-b pb-2 mb-4"><h3 class="font-bold">Kupon QR Code Jimpitan</h3><button onclick="closeQRModal()"><i data-lucide="x"></i></button></div>
-    <div id="printableCard" class="p-4 bg-slate-50 border-2 border-dashed border-brand-300 rounded-2xl flex flex-col items-center gap-2">
-      <div class="text-xs font-bold uppercase tracking-wider text-brand-700">E-JIMPITAN RT 08 & 09 / RW 03</div>
-      <div id="qrcodeContainer" class="p-2 bg-white rounded-xl border"></div>
-      <div><h4 id="qrModalNama" class="font-extrabold text-lg">Nama</h4><p id="qrModalNoRumah" class="text-xs text-slate-500"></p><p id="qrModalID" class="text-[10px] text-slate-400 font-mono mt-1"></p></div>
-    </div>
-    <div class="flex gap-2 pt-4"><button onclick="closeQRModal()" class="flex-1 py-2 bg-slate-100 text-sm font-bold rounded-xl">Tutup</button><button onclick="printSingleQR()" class="flex-1 py-2 bg-brand-600 text-white text-sm font-bold rounded-xl flex items-center justify-center gap-1"><i data-lucide="printer" class="w-4 h-4"></i>Cetak QR</button></div>
-  </div>
-</div>
-
+<!-- ========================================================= -->
 <!-- LOGIN -->
-<div id="modalLogin" class="fixed inset-0 bg-slate-900/85 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
-  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-    <div class="text-center mb-6">
-      <div class="w-16 h-16 bg-brand-100 text-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-3"><i data-lucide="lock" class="w-8 h-8"></i></div>
-      <h2 class="text-xl font-bold">Akses Petugas</h2>
-      <p class="text-xs text-slate-500 mt-1">Login akun pengurus/petugas Karang Taruna Gebang Kelopo.</p>
+<!-- ========================================================= -->
+
+<div id="modalLogin"
+     class="fixed inset-0 modal-bg flex items-center justify-center z-50 p-4">
+
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
+
+        <div class="bg-emerald-600 text-white p-6 text-center">
+
+            <div class="w-16 h-16 bg-white/20 rounded-2xl mx-auto
+                        flex items-center justify-center mb-3">
+
+                <i data-lucide="wallet-cards" class="w-8 h-8"></i>
+
+            </div>
+
+            <h1 class="text-2xl font-bold">
+                E-Jimpitan Digital
+            </h1>
+
+            <p class="text-sm text-emerald-100 mt-1">
+                RT 08 & 09 / RW 03
+            </p>
+
+        </div>
+
+        <form id="formLogin"
+              onsubmit="handleLogin(event)"
+              class="p-6">
+
+            <div class="mb-4">
+
+                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    id="loginUsername"
+                    autocomplete="username"
+                    required
+                    class="w-full border border-slate-300 rounded-xl px-4 py-3
+                           focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    placeholder="Masukkan username">
+
+            </div>
+
+            <div class="mb-5">
+
+                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="loginPassword"
+                    autocomplete="current-password"
+                    required
+                    class="w-full border border-slate-300 rounded-xl px-4 py-3
+                           focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    placeholder="Masukkan password">
+
+            </div>
+
+            <button
+                type="submit"
+                class="w-full bg-emerald-600 hover:bg-emerald-700
+                       text-white font-bold py-3 rounded-xl transition">
+
+                <i data-lucide="log-in" class="w-4 h-4 inline mr-1"></i>
+                Login
+
+            </button>
+
+            <div class="mt-5 bg-slate-50 rounded-xl p-4 text-xs text-slate-600">
+
+                <p class="font-bold mb-2">
+                    Akun Demo
+                </p>
+
+                <p>Ketua: <b>ketua / kt1</b></p>
+                <p>Wakil: <b>wakil / kt2</b></p>
+                <p>Bendahara: <b>bendahara1 / b1</b></p>
+                <p>Sekretaris: <b>sekretaris1 / s1</b></p>
+                <p>Petugas: <b>petugas01 / p01</b></p>
+
+            </div>
+
+        </form>
     </div>
-    <form id="formLogin" onsubmit="handleLogin(event)" class="space-y-4">
-      <div><label class="block text-xs font-semibold mb-1">Username / ID Petugas</label><input type="text" id="loginUsername" required autocomplete="username" placeholder="Contoh: ketua" class="w-full px-3.5 py-2.5 text-sm border rounded-xl"></div>
-      <div><label class="block text-xs font-semibold mb-1">Password</label><input type="password" id="loginPassword" required autocomplete="current-password" placeholder="Masukkan password" class="w-full px-3.5 py-2.5 text-sm border rounded-xl"></div>
-      <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-lg">Masuk Sistem</button>
-    </form>
-    <div class="mt-5 p-3 bg-slate-50 rounded-xl text-[11px] text-slate-500">
-      <b>Akun demo:</b> ketua / kt1 &nbsp;•&nbsp; petugas01 / p01
-    </div>
-  </div>
 </div>
 
-<div class="print-only p-8 text-black">
-  <div class="text-center mb-6 border-b pb-4">
-    <h1 class="text-2xl font-bold">REKAP KAS JIMPITAN DIGITAL</h1>
-    <p class="text-sm">RT 08 & 09 / RW 03 - Dusun Gebang Kelopo</p>
-    <p id="printDate" class="text-xs mt-1"></p>
-  </div>
-  <div id="printContent"></div>
+
+<!-- ========================================================= -->
+<!-- MODAL TAMBAH / EDIT WARGA -->
+<!-- ========================================================= -->
+
+<div id="modalWarga"
+     class="hidden fixed inset-0 modal-bg flex items-center justify-center z-50 p-4">
+
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg">
+
+        <div class="flex items-center justify-between p-5 border-b">
+
+            <h2 id="wargaModalTitle"
+                class="font-bold text-xl">
+
+                Tambah Warga
+
+            </h2>
+
+            <button onclick="closeWargaModal()"
+                    class="text-slate-500 hover:text-red-500">
+
+                <i data-lucide="x"></i>
+
+            </button>
+
+        </div>
+
+        <form id="formWarga"
+              onsubmit="saveWarga(event)"
+              class="p-5">
+
+            <input type="hidden" id="wargaId">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div>
+                    <label class="text-sm font-semibold">
+                        Nomor Rumah
+                    </label>
+
+                    <input id="wargaRumah"
+                           required
+                           class="w-full border rounded-xl px-3 py-2 mt-1"
+                           placeholder="Contoh: 001">
+                </div>
+
+                <div>
+                    <label class="text-sm font-semibold">
+                        Nama Kepala Keluarga
+                    </label>
+
+                    <input id="wargaNama"
+                           required
+                           class="w-full border rounded-xl px-3 py-2 mt-1"
+                           placeholder="Nama kepala keluarga">
+                </div>
+
+                <div>
+                    <label class="text-sm font-semibold">
+                        RT
+                    </label>
+
+                    <select id="wargaRT"
+                            class="w-full border rounded-xl px-3 py-2 mt-1">
+
+                        <option value="08">08</option>
+                        <option value="09">09</option>
+
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-sm font-semibold">
+                        RW
+                    </label>
+
+                    <input id="wargaRW"
+                           value="03"
+                           class="w-full border rounded-xl px-3 py-2 mt-1">
+                </div>
+
+                <div class="md:col-span-2">
+
+                    <label class="text-sm font-semibold">
+                        Nomor HP
+                    </label>
+
+                    <input id="wargaHP"
+                           class="w-full border rounded-xl px-3 py-2 mt-1"
+                           placeholder="08xxxxxxxxxx">
+
+                </div>
+
+            </div>
+
+            <div class="flex gap-2 mt-6">
+
+                <button type="button"
+                        onclick="closeWargaModal()"
+                        class="flex-1 bg-slate-200 py-3 rounded-xl font-semibold">
+
+                    Batal
+
+                </button>
+
+                <button type="submit"
+                        class="flex-1 bg-emerald-600 text-white py-3 rounded-xl font-bold">
+
+                    Simpan
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
 </div>
+
+
+<!-- ========================================================= -->
+<!-- MODAL QR -->
+<!-- ========================================================= -->
+
+<div id="modalQR"
+     class="hidden fixed inset-0 modal-bg flex items-center justify-center z-50 p-4">
+
+    <div class="bg-white rounded-3xl p-6 text-center max-w-sm w-full">
+
+        <button onclick="closeQRModal()"
+                class="float-right text-slate-500">
+
+            <i data-lucide="x"></i>
+
+        </button>
+
+        <h2 class="text-xl font-bold mb-2">
+            QR Code Warga
+        </h2>
+
+        <p id="qrNama"
+           class="font-semibold text-slate-700">
+        </p>
+
+        <div id="qrcode"
+             class="flex justify-center my-5">
+        </div>
+
+        <p id="qrId"
+           class="text-xs text-slate-500">
+        </p>
+
+    </div>
+</div>
+
+
+<!-- ========================================================= -->
+<!-- MODAL PEMBAYARAN -->
+<!-- ========================================================= -->
+
+<div id="modalBayar"
+     class="hidden fixed inset-0 modal-bg flex items-center justify-center z-50 p-4">
+
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md">
+
+        <div class="p-5 border-b">
+
+            <h2 class="text-xl font-bold">
+                Catat Pembayaran
+            </h2>
+
+            <p id="bayarNama"
+               class="text-sm text-slate-500 mt-1">
+            </p>
+
+        </div>
+
+        <form id="formBayar"
+              onsubmit="savePayment(event)"
+              class="p-5">
+
+            <input type="hidden" id="bayarWargaId">
+
+            <div class="mb-4">
+
+                <label class="text-sm font-semibold">
+                    Tanggal
+                </label>
+
+                <input type="date"
+                       id="bayarTanggal"
+                       required
+                       class="w-full border rounded-xl px-3 py-2 mt-1">
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="text-sm font-semibold">
+                    Nominal
+                </label>
+
+                <input type="number"
+                       id="bayarNominal"
+                       value="1000"
+                       min="0"
+                       required
+                       class="w-full border rounded-xl px-3 py-2 mt-1">
+
+            </div>
+
+            <div class="mb-5">
+
+                <label class="text-sm font-semibold">
+                    Keterangan
+                </label>
+
+                <textarea id="bayarKeterangan"
+                          class="w-full border rounded-xl px-3 py-2 mt-1"
+                          rows="3"
+                          placeholder="Keterangan pembayaran"></textarea>
+
+            </div>
+
+            <div class="flex gap-2">
+
+                <button type="button"
+                        onclick="closeBayarModal()"
+                        class="flex-1 bg-slate-200 py-3 rounded-xl font-semibold">
+
+                    Batal
+
+                </button>
+
+                <button type="submit"
+                        class="flex-1 bg-emerald-600 text-white py-3 rounded-xl font-bold">
+
+                    Simpan Pembayaran
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+<!-- ========================================================= -->
+<!-- APLIKASI -->
+<!-- ========================================================= -->
+
+<div id="app"
+     class="hidden min-h-screen">
+
+
+    <!-- HEADER -->
+
+    <header class="bg-emerald-700 text-white shadow-lg sticky top-0 z-30">
+
+        <div class="max-w-7xl mx-auto px-4">
+
+            <div class="flex items-center justify-between h-16">
+
+                <div class="flex items-center gap-3">
+
+                    <div class="bg-white/20 p-2 rounded-xl">
+
+                        <i data-lucide="wallet-cards"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h1 class="font-bold">
+                            E-Jimpitan Digital
+                        </h1>
+
+                        <p class="text-xs text-emerald-100">
+                            RT 08 & 09 / RW 03
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="flex items-center gap-3">
+
+                    <div class="hidden md:block text-right">
+
+                        <p id="currentOfficerName"
+                           class="font-bold text-sm">
+                        </p>
+
+                        <p class="text-xs text-emerald-100">
+                            Petugas aktif
+                        </p>
+
+                    </div>
+
+                    <button onclick="logoutOfficer()"
+                            class="bg-white/10 hover:bg-white/20
+                                   p-2 rounded-xl">
+
+                        <i data-lucide="log-out"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- LAYOUT -->
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+
+        <div class="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
+
+
+            <!-- SIDEBAR -->
+
+            <aside class="bg-white rounded-2xl shadow-sm border p-3 h-fit">
+
+                <button onclick="showPage('dashboard')"
+                        id="nav-dashboard"
+                        class="nav-button active w-full flex items-center gap-3
+                               px-4 py-3 rounded-xl text-left mb-1">
+
+                    <i data-lucide="layout-dashboard"
+                       class="w-5 h-5"></i>
+
+                    Dashboard
+
+                </button>
+
+                <button onclick="showPage('warga')"
+                        id="nav-warga"
+                        class="nav-button w-full flex items-center gap-3
+                               px-4 py-3 rounded-xl text-left mb-1">
+
+                    <i data-lucide="users"
+                       class="w-5 h-5"></i>
+
+                    Data Warga
+
+                </button>
+
+                <button onclick="showPage('riwayat')"
+                        id="nav-riwayat"
+                        class="nav-button w-full flex items-center gap-3
+                               px-4 py-3 rounded-xl text-left mb-1">
+
+                    <i data-lucide="history"
+                       class="w-5 h-5"></i>
+
+                    Riwayat
+
+                </button>
+
+            </aside>
+
+
+            <!-- CONTENT -->
+
+            <main>
+
+
+                <!-- ================================================= -->
+                <!-- DASHBOARD -->
+                <!-- ================================================= -->
+
+                <section id="page-dashboard">
+
+                    <div class="mb-6">
+
+                        <h2 class="text-2xl font-bold text-slate-800">
+                            Dashboard
+                        </h2>
+
+                        <p class="text-slate-500 text-sm">
+                            Ringkasan pembayaran jimpitan warga.
+                        </p>
+
+                    </div>
+
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+                        <div class="bg-white border rounded-2xl p-5 shadow-sm">
+
+                            <div class="flex items-center justify-between">
+
+                                <div>
+
+                                    <p class="text-sm text-slate-500">
+                                        Total Warga
+                                    </p>
+
+                                    <p id="dashboardTotalWarga"
+                                       class="text-3xl font-bold mt-1">
+                                        0
+                                    </p>
+
+                                </div>
+
+                                <div class="bg-blue-100 text-blue-600 p-3 rounded-xl">
+
+                                    <i data-lucide="users"></i>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="bg-white border rounded-2xl p-5 shadow-sm">
+
+                            <div class="flex items-center justify-between">
+
+                                <div>
+
+                                    <p class="text-sm text-slate-500">
+                                        Sudah Bayar Hari Ini
+                                    </p>
+
+                                    <p id="dashboardPaid"
+                                       class="text-3xl font-bold mt-1 text-emerald-600">
+                                        0
+                                    </p>
+
+                                </div>
+
+                                <div class="bg-emerald-100 text-emerald-600 p-3 rounded-xl">
+
+                                    <i data-lucide="circle-check"></i>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="bg-white border rounded-2xl p-5 shadow-sm">
+
+                            <div class="flex items-center justify-between">
+
+                                <div>
+
+                                    <p class="text-sm text-slate-500">
+                                        Belum Bayar Hari Ini
+                                    </p>
+
+                                    <p id="dashboardUnpaid"
+                                       class="text-3xl font-bold mt-1 text-red-600">
+                                        0
+                                    </p>
+
+                                </div>
+
+                                <div class="bg-red-100 text-red-600 p-3 rounded-xl">
+
+                                    <i data-lucide="circle-x"></i>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DASHBOARD UNPAID -->
+
+                    <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+
+                        <div class="p-5 border-b bg-red-50">
+
+                            <div class="flex items-center justify-between">
+
+                                <div>
+
+                                    <h3 class="font-bold text-red-800">
+                                        Warga Belum Membayar Hari Ini
+                                    </h3>
+
+                                    <p class="text-xs text-red-600 mt-1">
+                                        Daftar warga yang belum melakukan setoran.
+                                    </p>
+
+                                </div>
+
+                                <span id="dashboardUnpaidBadge"
+                                      class="bg-red-100 text-red-700
+                                             px-3 py-2 rounded-xl font-bold">
+
+                                    0
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="overflow-x-auto">
+
+                            <table class="w-full text-sm">
+
+                                <thead class="bg-slate-50">
+
+                                    <tr>
+
+                                        <th class="text-left px-4 py-3">No</th>
+                                        <th class="text-left px-4 py-3">Rumah</th>
+                                        <th class="text-left px-4 py-3">Nama</th>
+                                        <th class="text-left px-4 py-3">RT/RW</th>
+                                        <th class="text-left px-4 py-3">HP</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="dashboardUnpaidBody"
+                                       class="divide-y">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ================================================= -->
+                <!-- DATA WARGA -->
+                <!-- ================================================= -->
+
+                <section id="page-warga"
+                         class="hidden">
+
+                    <div class="flex flex-col md:flex-row
+                                md:items-center md:justify-between
+                                gap-4 mb-6">
+
+                        <div>
+
+                            <h2 class="text-2xl font-bold">
+                                Data Warga
+                            </h2>
+
+                            <p class="text-slate-500 text-sm">
+                                Kelola data warga dan status pembayaran.
+                            </p>
+
+                        </div>
+
+                        <button onclick="openWargaModal()"
+                                class="bg-emerald-600 hover:bg-emerald-700
+                                       text-white px-4 py-3 rounded-xl
+                                       font-bold">
+
+                            <i data-lucide="user-plus"
+                               class="w-4 h-4 inline"></i>
+
+                            Tambah Warga
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- FILTER -->
+
+                    <div class="bg-white rounded-2xl border shadow-sm p-4 mb-5">
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+                            <div>
+
+                                <label class="text-xs font-bold text-slate-500">
+                                    Cek Tanggal
+                                </label>
+
+                                <input type="date"
+                                       id="checkDateWarga"
+                                       onchange="renderWargaTable()"
+                                       class="w-full border rounded-xl px-3 py-2 mt-1">
+
+                            </div>
+
+                            <div>
+
+                                <label class="text-xs font-bold text-slate-500">
+                                    Cari Warga
+                                </label>
+
+                                <input type="text"
+                                       id="searchWarga"
+                                       oninput="renderWargaTable()"
+                                       placeholder="Cari nama / nomor rumah..."
+                                       class="w-full border rounded-xl px-3 py-2 mt-1">
+
+                            </div>
+
+                            <div class="flex items-end gap-2">
+
+                                <button onclick="setTodayDateWarga()"
+                                        class="flex-1 bg-slate-100
+                                               hover:bg-slate-200
+                                               px-3 py-2 rounded-xl
+                                               font-semibold">
+
+                                    Hari Ini
+
+                                </button>
+
+                                <button onclick="setYesterdayDateWarga()"
+                                        class="flex-1 bg-slate-100
+                                               hover:bg-slate-200
+                                               px-3 py-2 rounded-xl
+                                               font-semibold">
+
+                                    Kemarin
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- COUNT -->
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
+
+                        <div class="bg-white border rounded-2xl p-4">
+
+                            <p class="text-xs text-slate-500">
+                                Total Warga
+                            </p>
+
+                            <p id="countTotalWarga"
+                               class="text-2xl font-bold">
+                                0
+                            </p>
+
+                        </div>
+
+                        <div class="bg-emerald-50 border border-emerald-100
+                                    rounded-2xl p-4">
+
+                            <p class="text-xs text-emerald-600">
+                                Sudah Bayar
+                            </p>
+
+                            <p id="countPaidWarga"
+                               class="text-2xl font-bold text-emerald-700">
+                                0
+                            </p>
+
+                        </div>
+
+                        <div class="bg-red-50 border border-red-100
+                                    rounded-2xl p-4">
+
+                            <p class="text-xs text-red-600">
+                                Belum Bayar
+                            </p>
+
+                            <p id="countUnpaidWarga"
+                               class="text-2xl font-bold text-red-700">
+                                0
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TABLE -->
+
+                    <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+
+                        <div class="overflow-x-auto">
+
+                            <table class="w-full text-sm">
+
+                                <thead class="bg-slate-800 text-white">
+
+                                    <tr>
+
+                                        <th class="px-4 py-3 text-left">
+                                            No
+                                        </th>
+
+                                        <th class="px-4 py-3 text-left">
+                                            Rumah
+                                        </th>
+
+                                        <th class="px-4 py-3 text-left">
+                                            Nama
+                                        </th>
+
+                                        <th class="px-4 py-3 text-left">
+                                            RT/RW
+                                        </th>
+
+                                        <th class="px-4 py-3 text-left">
+                                            HP
+                                        </th>
+
+                                        <th class="px-4 py-3 text-left">
+                                            Status
+                                        </th>
+
+                                        <th class="px-4 py-3 text-center">
+                                            Aksi
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="wargaTableBody"
+                                       class="divide-y">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ================================================= -->
+                <!-- RIWAYAT -->
+                <!-- ================================================= -->
+
+                <section id="page-riwayat"
+                         class="hidden">
+
+                    <div class="mb-6">
+
+                        <h2 class="text-2xl font-bold">
+                            Riwayat & Rekap
+                        </h2>
+
+                        <p class="text-slate-500 text-sm">
+                            Melihat transaksi dan warga yang belum membayar.
+                        </p>
+
+                    </div>
+
+
+                    <!-- FILTER RIWAYAT -->
+
+                    <div class="bg-white border rounded-2xl shadow-sm p-4 mb-5">
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+                            <div>
+
+                                <label class="text-xs font-bold text-slate-500">
+                                    Tanggal Awal
+                                </label>
+
+                                <input type="date"
+                                       id="filterStartDate"
+                                       onchange="renderHistoryTable()"
+                                       class="w-full border rounded-xl px-3 py-2 mt-1">
+
+                            </div>
+
+                            <div>
+
+                                <label class="text-xs font-bold text-slate-500">
+                                    Tanggal Akhir
+                                </label>
+
+                                <input type="date"
+                                       id="filterEndDate"
+                                       onchange="renderHistoryTable()"
+                                       class="w-full border rounded-xl px-3 py-2 mt-1">
+
+                            </div>
+
+                            <div class="flex items-end">
+
+                                <button onclick="exportCSV()"
+                                        class="w-full bg-blue-600 hover:bg-blue-700
+                                               text-white px-4 py-2 rounded-xl
+                                               font-bold">
+
+                                    <i data-lucide="download"
+                                       class="w-4 h-4 inline"></i>
+
+                                    Export CSV
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- REKAP BELUM BAYAR -->
+
+                    <div class="bg-white rounded-2xl border shadow-sm
+                                overflow-hidden mb-6">
+
+                        <div class="p-5 border-b bg-amber-50
+                                    flex items-center justify-between">
+
+                            <div>
+
+                                <h3 class="font-bold text-amber-800">
+                                    Rekap Warga Belum Membayar
+                                </h3>
+
+                                <p class="text-xs text-amber-600 mt-1">
+                                    Berdasarkan tanggal akhir yang dipilih.
+                                </p>
+
+                            </div>
+
+                            <div class="bg-amber-100 text-amber-800
+                                        px-4 py-2 rounded-xl">
+
+                                <span class="text-xs font-semibold">
+                                    Belum Bayar
+                                </span>
+
+                                <span id="historyUnpaidCount"
+                                      class="block text-xl font-extrabold">
+                                    0
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="overflow-x-auto">
+
+                            <table class="w-full text-sm">
+
+                                <thead class="bg-slate-50">
+
+                                    <tr>
+
+                                        <th class="px-4 py-3 text-left">
+                                            No
+                                        </th>
+
+                                        <th class="px-4 py-3 text-left">
+                                            ID / Rumah
+                                        </th>
+
+                                        <th class="px-4 py-3 text-left">
+                                            Nama Kepala Keluarga
+                                        </th>
+
+                                        <th class="px-4 py-3 text-left">
+                                            RT / RW
+                                        </th>
+
+                                        <th class="px-4 py-3 text-left">
+                                            No. HP
+                                        </th>
+
+                                        <th class="px-4 py-3 text-center">
+                                            Aksi
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="historyUnpaidBody"
+                                       class="divide-y">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- RIWAYAT TRANSAKSI -->
+
+                    <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+
+                        <div class="p-5 border-b">
+
+                            <h3 class="font-bold">
+                                Riwayat Pembayaran
+                            </h3>
+
+                        </div>
+
+                        <div class="overflow-x-auto">
+
+                            <table class="w-full text-sm">
+
+                                <thead class="bg-slate-800 text-white">
+
+                                    <tr>
+
+                                        <th class="px-4 py-3 text-left">
+                                            Tanggal
+                                        </th>
+
+                                        <th class="px-4 py-3 text-left">
+                                            Nama
+                                        </th>
+
+                                        <th class="px-4 py-3 text-left">
+                                            Rumah
+                                        </th>
+
+                                        <th class="px-4 py-3 text-left">
+                                            Nominal
+                                        </th>
+
+                                        <th class="px-4 py-3 text-left">
+                                            Petugas
+                                        </th>
+
+                                        <th class="px-4 py-3 text-left">
+                                            Keterangan
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="historyTableBody"
+                                       class="divide-y">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </main>
+
+        </div>
+
+    </div>
+
+</div>
+
 
 <script>
+
 "use strict";
 
-/* =========================
-   KONFIGURASI & DATA
-========================= */
+/* =========================================================
+   STORAGE
+========================================================= */
+
 const STORAGE_KEY_WARGA = "ejimpitan_warga_v2";
 const STORAGE_KEY_LOGS = "ejimpitan_logs_v2";
 const STORAGE_KEY_OFFICER = "ejimpitan_officer_v2";
 const STORAGE_KEY_AUTH = "ejimpitan_auth_session_v2";
 
+
+/* =========================================================
+   DATA LOGIN
+========================================================= */
+
 const AUTHORIZED_USERS = [
-  {username:"ketua",password:"kt1",name:"Ketua Karang Taruna"},
-  {username:"wakil",password:"kt2",name:"Wakil Ketua"},
-  {username:"bendahara1",password:"b1",name:"Bendahara 1"},
-  {username:"bendahara2",password:"b2",name:"Bendahara 2"},
-  {username:"sekretaris1",password:"s1",name:"Sekretaris 1"},
-  {username:"sekretaris2",password:"s2",name:"Sekretaris 2"},
-  {username:"petugas01",password:"p01",name:"Petugas Piket RT 08"},
-  {username:"petugas02",password:"p02",name:"Petugas Piket RT 09"}
+
+    {
+        username: "ketua",
+        password: "kt1",
+        name: "Ketua Karang Taruna"
+    },
+
+    {
+        username: "wakil",
+        password: "kt2",
+        name: "Wakil Ketua"
+    },
+
+    {
+        username: "bendahara1",
+        password: "b1",
+        name: "Bendahara 1"
+    },
+
+    {
+        username: "bendahara2",
+        password: "b2",
+        name: "Bendahara 2"
+    },
+
+    {
+        username: "sekretaris1",
+        password: "s1",
+        name: "Sekretaris 1"
+    },
+
+    {
+        username: "sekretaris2",
+        password: "s2",
+        name: "Sekretaris 2"
+    },
+
+    {
+        username: "petugas01",
+        password: "p01",
+        name: "Petugas Piket RT 08"
+    },
+
+    {
+        username: "petugas02",
+        password: "p02",
+        name: "Petugas Piket RT 09"
+    }
+
 ];
 
-const initialWarga = [
-  {id:"JMP-101",noRumah:"A-01",nama:"Bapak Ahmad Subagyo",rt:"08",rw:"03",phone:"08123456781"},
-  {id:"JMP-102",noRumah:"A-02",nama:"Ibu Ratna Pertiwi",rt:"08",rw:"03",phone:"08123456782"},
-  {id:"JMP-103",noRumah:"A-03",nama:"Pak Hendra Wijaya",rt:"08",rw:"03",phone:"08123456783"},
-  {id:"JMP-104",noRumah:"B-01",nama:"Bapak Bambang S.",rt:"09",rw:"03",phone:"08123456784"},
-  {id:"JMP-105",noRumah:"B-02",nama:"Pak Joko Widodo",rt:"09",rw:"03",phone:"08123456785"},
-  {id:"JMP-106",noRumah:"C-01",nama:"Ibu Siti Aminah",rt:"09",rw:"03",phone:"08123456786"},
-  {id:"JMP-107",noRumah:"C-02",nama:"Pak Budi Darmawan",rt:"09",rw:"03",phone:"08123456787"}
-];
 
-function dateOnly(d=new Date()){
-  const y=d.getFullYear();
-  const m=String(d.getMonth()+1).padStart(2,"0");
-  const day=String(d.getDate()).padStart(2,"0");
-  return `${y}-${m}-${day}`;
-}
-function dateTimeNow(){
-  const d=new Date();
-  return `${dateOnly(d)} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`;
-}
-const todayStr = dateOnly();
+/* =========================================================
+   VARIABLE
+========================================================= */
 
-function makeInitialLogs(){
-  const d=new Date();
-  const y=new Date(d.getTime()-86400000);
-  return [
-    {id:"TRX-1001",wargaId:"JMP-101",noRumah:"A-01",nama:"Bapak Ahmad Subagyo",nominal:2000,timestamp:`${dateOnly(d)} 20:15:00`,officer:"Budi Santoso"},
-    {id:"TRX-1002",wargaId:"JMP-102",noRumah:"A-02",nama:"Ibu Ratna Pertiwi",nominal:2000,timestamp:`${dateOnly(d)} 20:18:22`,officer:"Budi Santoso"},
-    {id:"TRX-1003",wargaId:"JMP-103",noRumah:"A-03",nama:"Pak Hendra Wijaya",nominal:2000,timestamp:`${dateOnly(y)} 20:45:10`,officer:"Agus Pratama"},
-    {id:"TRX-1004",wargaId:"JMP-105",noRumah:"B-02",nama:"Pak Joko Widodo",nominal:2000,timestamp:`${dateOnly(y)} 21:05:30`,officer:"Agus Pratama"}
-  ];
+let wargaList = [];
+let logsList = [];
+let currentOfficer = "";
+
+
+/* =========================================================
+   TANGGAL
+========================================================= */
+
+function dateOnly(date = new Date()) {
+
+    const year = date.getFullYear();
+
+    const month = String(date.getMonth() + 1)
+        .padStart(2, "0");
+
+    const day = String(date.getDate())
+        .padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
 }
 
-function loadJSON(key,fallback){
-  try{
-    const value=localStorage.getItem(key);
-    return value ? JSON.parse(value) : fallback;
-  }catch(e){
-    console.error("Gagal membaca localStorage",key,e);
-    return fallback;
-  }
+
+function formatDate(dateString) {
+
+    if (!dateString) return "-";
+
+    const parts = dateString.split("-");
+
+    if (parts.length !== 3) return dateString;
+
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
 }
 
-let wargaList = loadJSON(STORAGE_KEY_WARGA,initialWarga);
-let logsList = loadJSON(STORAGE_KEY_LOGS,makeInitialLogs());
-let currentOfficer = localStorage.getItem(STORAGE_KEY_OFFICER) || "Budi Santoso";
-let html5QrcodeScanner = null;
-let chartInstance = null;
-let lastScannedId = "";
-let lastScanTime = 0;
 
-function saveData(){
-  localStorage.setItem(STORAGE_KEY_WARGA,JSON.stringify(wargaList));
-  localStorage.setItem(STORAGE_KEY_LOGS,JSON.stringify(logsList));
-  localStorage.setItem(STORAGE_KEY_OFFICER,currentOfficer);
-}
+function setDefaultDates() {
 
-/* =========================
-   INISIALISASI
-========================= */
-window.addEventListener("DOMContentLoaded",()=>{
-  lucide.createIcons();
+    const today = dateOnly();
 
-  document.getElementById("currentOfficerName").textContent=currentOfficer;
+    const yesterdayDate = new Date();
 
-  const end=document.getElementById("filterEndDate");
-  const start=document.getElementById("filterStartDate");
-  if(end) end.value=todayStr;
-  if(start){
-    const d=new Date();
-    d.setDate(d.getDate()-30);
-    start.value=dateOnly(d);
-  }
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
 
-  updateDashboardStats();
-  renderWargaTable();
-  renderHistoryTable();
-  populateSimulateSelect();
-  initChart();
-  checkAuthSession();
-  lucide.createIcons();
-});
+    const yesterday = dateOnly(yesterdayDate);
 
-function checkAuthSession(){
-  const modal=document.getElementById("modalLogin");
-  const saved=localStorage.getItem(STORAGE_KEY_AUTH);
+    const checkDate =
+        document.getElementById("checkDateWarga");
 
-  if(!saved){
-    modal.classList.remove("hidden");
-    return;
-  }
+    const startDate =
+        document.getElementById("filterStartDate");
 
-  try{
-    const user=JSON.parse(saved);
-    if(!user || !user.username){
-      throw new Error("Session tidak valid");
+    const endDate =
+        document.getElementById("filterEndDate");
+
+    const bayarTanggal =
+        document.getElementById("bayarTanggal");
+
+    if (checkDate && !checkDate.value) {
+        checkDate.value = today;
     }
-    currentOfficer=user.name;
-    localStorage.setItem(STORAGE_KEY_OFFICER,currentOfficer);
-    document.getElementById("currentOfficerName").textContent=currentOfficer;
-    modal.classList.add("hidden");
-  }catch(e){
-    localStorage.removeItem(STORAGE_KEY_AUTH);
-    modal.classList.remove("hidden");
-  }
-}
 
-/* =========================
-   AUTH
-========================= */
-function handleLogin(event){
-  event.preventDefault();
-
-  const username=document.getElementById("loginUsername").value.trim().toLowerCase();
-  const password=document.getElementById("loginPassword").value.trim();
-
-  const user=AUTHORIZED_USERS.find(u=>u.username.toLowerCase()===username && u.password===password);
-
-  if(!user){
-    Swal.fire({icon:"error",title:"Login Gagal",text:"Username atau password salah!",confirmButtonColor:"#ef4444"});
-    return;
-  }
-
-  localStorage.setItem(STORAGE_KEY_AUTH,JSON.stringify(user));
-  currentOfficer=user.name;
-  localStorage.setItem(STORAGE_KEY_OFFICER,currentOfficer);
-  document.getElementById("currentOfficerName").textContent=currentOfficer;
-  document.getElementById("modalLogin").classList.add("hidden");
-  document.getElementById("formLogin").reset();
-
-  Swal.fire({icon:"success",title:"Login Berhasil",text:`Selamat bertugas, ${user.name}!`,timer:1400,showConfirmButton:false});
-}
-
-function logoutOfficer(){
-  Swal.fire({
-    title:"Keluar Sistem?",
-    text:"Sesi petugas akan diakhiri.",
-    icon:"question",
-    showCancelButton:true,
-    confirmButtonColor:"#ef4444",
-    confirmButtonText:"Ya, Keluar",
-    cancelButtonText:"Batal"
-  }).then(result=>{
-    if(result.isConfirmed){
-      localStorage.removeItem(STORAGE_KEY_AUTH);
-      document.getElementById("modalLogin").classList.remove("hidden");
-      document.getElementById("loginUsername").focus();
+    if (startDate && !startDate.value) {
+        startDate.value = yesterday;
     }
-  });
-}
 
-function changeOfficer(){
-  if(!localStorage.getItem(STORAGE_KEY_AUTH)) return;
-  Swal.fire({
-    title:"Ganti Petugas",
-    input:"text",
-    inputValue:currentOfficer,
-    inputLabel:"Nama petugas yang bertugas",
-    showCancelButton:true,
-    confirmButtonText:"Simpan",
-    cancelButtonText:"Batal",
-    confirmButtonColor:"#16a34a",
-    inputValidator:value=>!value.trim()?"Nama tidak boleh kosong!":undefined
-  }).then(result=>{
-    if(result.isConfirmed){
-      currentOfficer=result.value.trim();
-      document.getElementById("currentOfficerName").textContent=currentOfficer;
-      saveData();
-      Toast.fire({icon:"success",title:"Petugas diperbarui"});
+    if (endDate && !endDate.value) {
+        endDate.value = today;
     }
-  });
-}
 
-/* =========================
-   NAVIGASI
-========================= */
-function switchTab(tabName){
-  document.querySelectorAll("main > section").forEach(sec=>sec.classList.add("hidden"));
-  document.querySelectorAll(".nav-tab").forEach(btn=>{
-    btn.classList.remove("bg-brand-50","text-brand-700");
-    btn.classList.add("text-slate-600");
-  });
-
-  document.getElementById(`view-${tabName}`).classList.remove("hidden");
-  const tab=document.getElementById(`tab-${tabName}`);
-  tab.classList.add("bg-brand-50","text-brand-700");
-  tab.classList.remove("text-slate-600");
-
-  if(tabName!=="scan") stopScanner();
-  if(tabName==="dashboard"){updateDashboardStats();updateChartData();}
-  if(tabName==="warga") renderWargaTable();
-  if(tabName==="scan") populateSimulateSelect();
-  if(tabName==="riwayat") renderHistoryTable();
-}
-
-/* =========================
-   DASHBOARD
-========================= */
-function updateDashboardStats(){
-  const total=logsList.reduce((sum,l)=>sum+Number(l.nominal||0),0);
-  const todayLogs=logsList.filter(l=>l.timestamp.startsWith(todayStr));
-  const todaySum=todayLogs.reduce((sum,l)=>sum+Number(l.nominal||0),0);
-  const uniquePaid=new Set(todayLogs.map(l=>l.wargaId)).size;
-  const month=todayStr.slice(0,7);
-  const monthSum=logsList.filter(l=>l.timestamp.startsWith(month)).reduce((sum,l)=>sum+Number(l.nominal||0),0);
-  const pct=wargaList.length?Math.round(uniquePaid/wargaList.length*100):0;
-
-  document.getElementById("statTotalSaldo").textContent=formatRupiah(total);
-  document.getElementById("statTodayIncome").textContent=formatRupiah(todaySum);
-  document.getElementById("statTodayCount").textContent=`${uniquePaid} dari ${wargaList.length} KK telah bayar`;
-  document.getElementById("statMonthIncome").textContent=formatRupiah(monthSum);
-  document.getElementById("statTotalWarga").textContent=`${wargaList.length} KK`;
-  document.getElementById("statPaidTodayPercent").textContent=`${pct}% tercover hari ini`;
-
-  const box=document.getElementById("dashboardRecentLogs");
-  const recent=[...logsList].sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp)).slice(0,6);
-  box.innerHTML=recent.length ? recent.map(l=>`
-    <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border">
-      <div class="flex items-center gap-2">
-        <div class="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>
-        <div><p class="font-bold text-xs">${escapeHTML(l.nama)} (${escapeHTML(l.noRumah)})</p><p class="text-[10px] text-slate-400">${formatDateTime(l.timestamp)} • ${escapeHTML(l.officer)}</p></div>
-      </div>
-      <span class="font-extrabold text-emerald-600 text-xs">+${formatRupiah(l.nominal)}</span>
-    </div>`).join("") :
-    `<p class="text-xs text-slate-400 py-2">Belum ada transaksi.</p>`;
-  lucide.createIcons();
-}
-
-function get7DaysData(){
-  const labels=[],data=[];
-  for(let i=6;i>=0;i--){
-    const d=new Date();
-    d.setDate(d.getDate()-i);
-    const ds=dateOnly(d);
-    labels.push(d.toLocaleDateString("id-ID",{weekday:"short",day:"numeric",month:"short"}));
-    data.push(logsList.filter(l=>l.timestamp.startsWith(ds)).reduce((s,l)=>s+Number(l.nominal||0),0));
-  }
-  return {labels,data};
-}
-
-function initChart(){
-  const ctx=document.getElementById("chartJimpitan").getContext("2d");
-  const d=get7DaysData();
-  chartInstance=new Chart(ctx,{
-    type:"bar",
-    data:{labels:d.labels,datasets:[{label:"Total Setoran",data:d.data,backgroundColor:"#22c55e",borderRadius:8}]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
-      scales:{y:{beginAtZero:true,ticks:{callback:v=>"Rp "+Number(v).toLocaleString("id-ID")}}}
+    if (bayarTanggal && !bayarTanggal.value) {
+        bayarTanggal.value = today;
     }
-  });
-}
-function updateChartData(){
-  if(!chartInstance)return;
-  const d=get7DaysData();
-  chartInstance.data.labels=d.labels;
-  chartInstance.data.datasets[0].data=d.data;
-  chartInstance.update();
 }
 
-/* =========================
-   DATA WARGA
-========================= */
-  <!-- KONTROL PEMILIH TANGGAL -->
-<div class="flex items-center space-x-1 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
-    <i data-lucide="calendar" class="w-4 h-4 text-slate-500"></i>
-    <span class="text-xs font-semibold text-slate-600">Cek Tanggal:</span>
-    <input type="date" id="checkDateWarga" onchange="renderWargaTable()" class="bg-transparent text-xs font-bold text-emerald-700 focus:outline-none">
-</div>
 
-<button onclick="setTodayDateWarga()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">Hari Ini</button>
-<button onclick="setYesterdayDateWarga()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">Kemarin</button>
-function renderWargaTable(){
-  const tbody=document.getElementById("tableWargaBody");
-  const search=(document.getElementById("searchWarga").value||"").toLowerCase();
-  const status=document.getElementById("filterStatus").value;
-  const paidSet=new Set(logsList.filter(l=>l.timestamp.startsWith(todayStr)).map(l=>l.wargaId));
+/* =========================================================
+   LOAD DATA
+========================================================= */
 
-  const filtered=wargaList.filter(w=>{
-    const match=[w.nama,w.noRumah,w.id,w.rt,w.rw].join(" ").toLowerCase().includes(search);
-    const paid=paidSet.has(w.id);
-    return match && (status==="ALL" || (status==="PAID"&&paid) || (status==="UNPAID"&&!paid));
-  });
+function loadData() {
 
-  if(!filtered.length){
-    tbody.innerHTML=`<tr><td colspan="6" class="px-5 py-8 text-center text-slate-400">Data warga tidak ditemukan.</td></tr>`;
-    return;
-  }
+    try {
 
-  tbody.innerHTML=filtered.map(w=>{
-    const paid=paidSet.has(w.id);
-    return `<tr class="hover:bg-slate-50">
-      <td class="px-5 py-3.5 font-bold">${escapeHTML(w.noRumah)}<span class="block text-[10px] text-slate-400 font-mono font-normal">${escapeHTML(w.id)}</span></td>
-      <td class="px-5 py-3.5 font-medium">${escapeHTML(w.nama)}</td>
-      <td class="px-5 py-3.5 text-slate-500">RT ${escapeHTML(w.rt)} / RW ${escapeHTML(w.rw)}</td>
-      <td class="px-5 py-3.5">${paid
-        ? `<span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-semibold">✓ Sudah Setor</span>`
-        : `<span class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 text-xs px-2.5 py-1 rounded-full font-semibold">◷ Belum Setor</span>`}</td>
-      <td class="px-5 py-3.5 text-center"><button onclick="openQRModal('${w.id}')" class="p-2 bg-slate-100 hover:bg-brand-50 hover:text-brand-600 rounded-xl"><i data-lucide="qr-code" class="w-4 h-4"></i></button></td>
-      <td class="px-5 py-3.5 text-right space-x-1">
-        <button onclick="quickPay('${w.id}')" title="Setor" class="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="plus-circle" class="w-4 h-4"></i></button>
-        <button onclick="openWargaModal('${w.id}')" title="Edit" class="p-1.5 bg-slate-100 text-slate-600 rounded-lg"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-        <button onclick="deleteWarga('${w.id}')" title="Hapus" class="p-1.5 bg-rose-50 text-rose-600 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-      </td>
-    </tr>`;
-  }).join("");
-  lucide.createIcons();
-}
+        const warga =
+            localStorage.getItem(STORAGE_KEY_WARGA);
 
-function openWargaModal(id=null){
-  const form=document.getElementById("formWarga");
-  form.reset();
-  document.getElementById("wargaId").value="";
-  document.getElementById("wargaRT").value="08";
-  document.getElementById("wargaRW").value="03";
+        const logs =
+            localStorage.getItem(STORAGE_KEY_LOGS);
 
-  if(id){
-    const w=wargaList.find(x=>x.id===id);
-    if(!w)return;
-    document.getElementById("modalWargaTitle").textContent="Edit Data Warga";
-    document.getElementById("wargaId").value=w.id;
-    document.getElementById("wargaNoRumah").value=w.noRumah;
-    document.getElementById("wargaNama").value=w.nama;
-    document.getElementById("wargaRT").value=w.rt;
-    document.getElementById("wargaRW").value=w.rw;
-    document.getElementById("wargaPhone").value=w.phone||"";
-  }else{
-    document.getElementById("modalWargaTitle").textContent="Tambah Data Warga";
-  }
-  document.getElementById("modalWarga").classList.remove("hidden");
-}
-function closeWargaModal(){document.getElementById("modalWarga").classList.add("hidden");}
+        wargaList = warga
+            ? JSON.parse(warga)
+            : [];
 
-function saveWarga(event){
-  event.preventDefault();
-  const id=document.getElementById("wargaId").value;
-  const data={
-    noRumah:document.getElementById("wargaNoRumah").value.trim(),
-    nama:document.getElementById("wargaNama").value.trim(),
-    rt:document.getElementById("wargaRT").value.trim()||"08",
-    rw:document.getElementById("wargaRW").value.trim()||"03",
-    phone:document.getElementById("wargaPhone").value.trim()
-  };
+        logsList = logs
+            ? JSON.parse(logs)
+            : [];
 
-  if(!data.noRumah||!data.nama)return;
+        if (!Array.isArray(wargaList)) {
+            wargaList = [];
+        }
 
-  if(id){
-    const index=wargaList.findIndex(w=>w.id===id);
-    if(index>=0)wargaList[index]={...wargaList[index],...data};
-  }else{
-    data.id=generateWargaId();
-    wargaList.push(data);
-  }
+        if (!Array.isArray(logsList)) {
+            logsList = [];
+        }
 
-  saveData();
-  closeWargaModal();
-  renderWargaTable();
-  populateSimulateSelect();
-  updateDashboardStats();
-  Toast.fire({icon:"success",title:"Data warga berhasil disimpan"});
-}
+    } catch (error) {
 
-function generateWargaId(){
-  let id;
-  do{id="JMP-"+Math.floor(100+Math.random()*900)}while(wargaList.some(w=>w.id===id));
-  return id;
-}
+        console.error(error);
 
-function deleteWarga(id){
-  Swal.fire({
-    title:"Hapus Data Warga?",
-    text:"Data transaksi lama tetap tersimpan.",
-    icon:"warning",
-    showCancelButton:true,
-    confirmButtonColor:"#ef4444",
-    confirmButtonText:"Ya, Hapus",
-    cancelButtonText:"Batal"
-  }).then(result=>{
-    if(result.isConfirmed){
-      wargaList=wargaList.filter(w=>w.id!==id);
-      saveData();
-      renderWargaTable();
-      populateSimulateSelect();
-      updateDashboardStats();
-      Toast.fire({icon:"success",title:"Data warga dihapus"});
+        wargaList = [];
+        logsList = [];
+
     }
-  });
+
 }
 
-/* =========================
-   QR GENERATOR
-========================= */
-function openQRModal(id){
-  const w=wargaList.find(x=>x.id===id);
-  if(!w)return;
 
-  document.getElementById("qrModalNama").textContent=w.nama;
-  document.getElementById("qrModalNoRumah").textContent=`No. Rumah: ${w.noRumah} (RT ${w.rt}/RW ${w.rw})`;
-  document.getElementById("qrModalID").textContent=`ID: ${w.id}`;
+function saveData() {
 
-  const container=document.getElementById("qrcodeContainer");
-  container.innerHTML="";
+    localStorage.setItem(
+        STORAGE_KEY_WARGA,
+        JSON.stringify(wargaList)
+    );
 
-  const payload=JSON.stringify({id:w.id,noRumah:w.noRumah,nama:w.nama});
+    localStorage.setItem(
+        STORAGE_KEY_LOGS,
+        JSON.stringify(logsList)
+    );
 
-  new QRCode(container,{
-    text:payload,width:180,height:180,colorDark:"#15803d",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.H
-  });
-
-  document.getElementById("modalQR").classList.remove("hidden");
-}
-function closeQRModal(){document.getElementById("modalQR").classList.add("hidden");}
-
-function printSingleQR(){
-  const card=document.getElementById("printableCard").cloneNode(true);
-  const win=window.open("","_blank","width=500,height=700");
-  if(!win){Swal.fire("Pop-up diblokir","Izinkan pop-up browser untuk mencetak QR.","warning");return;}
-  win.document.write(`<!DOCTYPE html><html><head><title>QR Jimpitan</title>
-    <style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;padding:30px}.card{width:320px;text-align:center;border:2px dashed #16a34a;padding:20px;border-radius:18px}h3{margin:8px 0}p{margin:4px;color:#555;font-size:12px}</style>
-    </head><body><div class="card">${card.innerHTML}</div><script>window.onload=()=>{window.print();}<\/script></body></html>`);
-  win.document.close();
 }
 
-/* =========================
-   SCANNER
-========================= */
-function startScanner(){
-  if(html5QrcodeScanner)return;
 
-  const startBtn=document.getElementById("btnStartScan");
-  const stopBtn=document.getElementById("btnStopScan");
-  startBtn.disabled=true;
-  stopBtn.disabled=false;
+/* =========================================================
+   LOGIN
+========================================================= */
 
-  html5QrcodeScanner=new Html5Qrcode("qr-reader");
+function handleLogin(event) {
 
-  html5QrcodeScanner.start(
-    {facingMode:"environment"},
-    {fps:10,qrbox:{width:220,height:220}},
-    onScanSuccess,
-    ()=>{}
-  ).catch(error=>{
-    console.error(error);
-    Swal.fire({icon:"error",title:"Kamera Tidak Bisa Dibuka",text:"Izinkan akses kamera dan gunakan HTTPS/localhost. Jika tidak bisa, gunakan simulasi scan manual."});
-    stopScanner();
-  });
-}
+    event.preventDefault();
 
-function stopScanner(){
-  const scanner=html5QrcodeScanner;
-  html5QrcodeScanner=null;
-  document.getElementById("btnStartScan").disabled=false;
-  document.getElementById("btnStopScan").disabled=true;
+    const usernameInput =
+        document.getElementById("loginUsername");
 
-  if(scanner){
-    scanner.stop().then(()=>scanner.clear()).catch(()=>{try{scanner.clear()}catch(e){}});
-  }
-}
+    const passwordInput =
+        document.getElementById("loginPassword");
 
-function onScanSuccess(decodedText){
-  const now=Date.now();
-  if(decodedText===lastScannedId && now-lastScanTime<3000)return;
-  lastScannedId=decodedText;
-  lastScanTime=now;
+    const username =
+        usernameInput.value.trim().toLowerCase();
 
-  let payload;
-  try{payload=JSON.parse(decodedText)}catch(e){payload={id:decodedText.trim()}}
+    const password =
+        passwordInput.value.trim();
 
-  if(!payload.id){
-    Toast.fire({icon:"warning",title:"QR tidak berisi ID warga"});
-    return;
-  }
+    const user =
+        AUTHORIZED_USERS.find(
+            item =>
+                item.username.toLowerCase() === username &&
+                item.password === password
+        );
 
-  const nominal=parseInt(document.getElementById("scanNominalInput").value,10)||2000;
-  processJimpitanPayment(payload.id,nominal);
-  playBeepSound();
-}
 
-/* =========================
-   PEMBAYARAN
-========================= */
-function populateSimulateSelect(){
-  const select=document.getElementById("selectSimulateWarga");
-  select.innerHTML='<option value="">-- Pilih Warga / Rumah --</option>';
-  wargaList.forEach(w=>{
-    const opt=document.createElement("option");
-    opt.value=w.id;
-    opt.textContent=`${w.noRumah} - ${w.nama}`;
-    select.appendChild(opt);
-  });
-}
+    if (!user) {
 
-function simulateScanFromSelect(){
-  const id=document.getElementById("selectSimulateWarga").value;
-  if(!id){
-    Swal.fire("Pilih Warga","Silakan pilih warga terlebih dahulu.","warning");
-    return;
-  }
-  const nominal=parseInt(document.getElementById("scanNominalInput").value,10)||2000;
-  processJimpitanPayment(id,nominal);
-}
+        Swal.fire({
 
-function quickPay(wargaId){
-  const nominal=parseInt(document.getElementById("scanNominalInput").value,10)||2000;
-  processJimpitanPayment(wargaId,nominal);
-}
+            icon: "error",
 
-function processJimpitanPayment(wargaId,nominal){
-  const w=wargaList.find(x=>x.id===wargaId);
-  if(!w){
-    Swal.fire("Error","Data warga tidak ditemukan.","error");
-    return;
-  }
+            title: "Login gagal",
 
-  nominal=Number(nominal);
-  if(!Number.isFinite(nominal)||nominal<=0){
-    Swal.fire("Nominal tidak valid","Masukkan nominal lebih dari 0.","warning");
-    return;
-  }
+            text: "Username atau password salah.",
 
-  const alreadyPaid=logsList.some(l=>l.wargaId===wargaId && l.timestamp.startsWith(todayStr));
-  if(alreadyPaid){
+            confirmButtonColor: "#059669"
+
+        });
+
+        return;
+
+    }
+
+
+    currentOfficer = user.name;
+
+
+    localStorage.setItem(
+        STORAGE_KEY_AUTH,
+        JSON.stringify({
+            username: user.username,
+            name: user.name
+        })
+    );
+
+
+    localStorage.setItem(
+        STORAGE_KEY_OFFICER,
+        currentOfficer
+    );
+
+
+    document.getElementById(
+        "currentOfficerName"
+    ).textContent = currentOfficer;
+
+
+    document.getElementById(
+        "modalLogin"
+    ).classList.add("hidden");
+
+
+    document.getElementById(
+        "app"
+    ).classList.remove("hidden");
+
+
+    document.getElementById(
+        "formLogin"
+    ).reset();
+
+
+    initializeApp();
+
+
     Swal.fire({
-      icon:"warning",
-      title:"Sudah Setor Hari Ini",
-      text:`${w.nama} sudah tercatat membayar hari ini. Tetap catat setoran baru?`,
-      showCancelButton:true,
-      confirmButtonText:"Tetap Catat",
-      cancelButtonText:"Batal",
-      confirmButtonColor:"#16a34a"
-    }).then(r=>{if(r.isConfirmed)saveTransaction(w,nominal)});
-  }else{
-    saveTransaction(w,nominal);
-  }
-}
 
-function saveTransaction(w,nominal){
-  logsList.push({
-    id:"TRX-"+Date.now().toString().slice(-8),
-    wargaId:w.id,
-    noRumah:w.noRumah,
-    nama:w.nama,
-    nominal,
-    timestamp:dateTimeNow(),
-    officer:currentOfficer
-  });
+        icon: "success",
 
-  saveData();
-  updateDashboardStats();
-  updateChartData();
-  renderWargaTable();
-  renderHistoryTable();
+        title: "Login berhasil",
 
-  Swal.fire({
-    icon:"success",
-    title:"Setoran Berhasil!",
-    html:`<p class="font-semibold">${escapeHTML(w.nama)} (${escapeHTML(w.noRumah)})</p><p class="text-2xl font-extrabold text-emerald-600">${formatRupiah(nominal)}</p><p class="text-xs text-slate-400">Petugas: ${escapeHTML(currentOfficer)}</p>`,
-    timer:1800,
-    showConfirmButton:false
-  });
-}
+        text: `Selamat datang, ${user.name}`,
 
-function playBeepSound(){
-  try{
-    const Ctx=window.AudioContext||window.webkitAudioContext;
-    if(!Ctx)return;
-    const ctx=new Ctx();
-    const osc=ctx.createOscillator();
-    const gain=ctx.createGain();
-    osc.connect(gain);gain.connect(ctx.destination);
-    osc.frequency.value=880;gain.gain.value=.1;
-    osc.start();osc.stop(ctx.currentTime+.15);
-  }catch(e){}
-}
+        timer: 1500,
 
-/* =========================
-   RIWAYAT
-========================= */
-function renderHistoryTable(){
-  const tbody=document.getElementById("tableHistoryBody");
-  const search=(document.getElementById("searchHistory").value||"").toLowerCase();
-  const start=document.getElementById("filterStartDate").value;
-  const end=document.getElementById("filterEndDate").value;
+        showConfirmButton: false
 
-  const filtered=logsList.filter(l=>{
-    const date=l.timestamp.split(" ")[0];
-    const inRange=(!start||date>=start)&&(!end||date<=end);
-    const match=[l.nama,l.noRumah,l.wargaId,l.officer].join(" ").toLowerCase().includes(search);
-    return inRange&&match;
-  }).sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
-
-  if(!filtered.length){
-    tbody.innerHTML='<tr><td colspan="6" class="px-5 py-8 text-center text-slate-400">Tidak ada catatan transaksi.</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML=filtered.map(l=>`
-    <tr class="hover:bg-slate-50">
-      <td class="px-5 py-3.5 text-xs font-semibold text-slate-600">${formatDateTime(l.timestamp)}</td>
-      <td class="px-5 py-3.5 font-bold">${escapeHTML(l.nama)}<span class="block text-[10px] text-slate-400 font-mono font-normal">${escapeHTML(l.wargaId)}</span></td>
-      <td class="px-5 py-3.5">${escapeHTML(l.noRumah)}</td>
-      <td class="px-5 py-3.5 font-extrabold text-emerald-600">${formatRupiah(l.nominal)}</td>
-      <td class="px-5 py-3.5 text-xs text-slate-500">${escapeHTML(l.officer)}</td>
-      <td class="px-5 py-3.5 text-right"><button onclick="deleteLog('${l.id}')" class="p-1.5 bg-rose-50 text-rose-600 rounded-lg"><i data-lucide="trash" class="w-3.5 h-3.5"></i></button></td>
-    </tr>`).join("");
-  lucide.createIcons();
-}
-
-function deleteLog(id){
-  Swal.fire({
-    title:"Batalkan Setoran?",
-    text:"Transaksi akan dihapus dari saldo.",
-    icon:"warning",
-    showCancelButton:true,
-    confirmButtonColor:"#ef4444",
-    confirmButtonText:"Ya, Batalkan",
-    cancelButtonText:"Batal"
-  }).then(r=>{
-    if(r.isConfirmed){
-      logsList=logsList.filter(l=>l.id!==id);
-      saveData();
-      updateDashboardStats();
-      updateChartData();
-      renderWargaTable();
-      renderHistoryTable();
-      Toast.fire({icon:"success",title:"Setoran dibatalkan"});
-    }
-  });
-}
-
-/* =========================
-   EXPORT & PRINT
-========================= */
-function csvEscape(value){
-  return `"${String(value??"").replace(/"/g,'""')}"`;
-}
-function exportToCSV(){
-  if(!logsList.length){
-    Swal.fire("Data Kosong","Belum ada transaksi.","info");
-    return;
-  }
-
-  const rows=[
-    ["ID Transaksi","ID Warga","No Rumah","Nama Warga","Nominal","Waktu","Petugas Kartar"],
-    ...logsList.map(l=>[l.id,l.wargaId,l.noRumah,l.nama,l.nominal,l.timestamp,l.officer])
-  ];
-  const csv="\uFEFF"+rows.map(row=>row.map(csvEscape).join(",")).join("\r\n");
-  const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url;
-  a.download=`Rekap_Jimpitan_RT08_09_${todayStr}.csv`;
-  document.body.appendChild(a);a.click();a.remove();
-  URL.revokeObjectURL(url);
-}
-
-function printReport(){
-  const start=document.getElementById("filterStartDate").value;
-  const end=document.getElementById("filterEndDate").value;
-  const rows=logsList.filter(l=>{
-    const d=l.timestamp.split(" ")[0];
-    return (!start||d>=start)&&(!end||d<=end);
-  }).sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
-
-  document.getElementById("printDate").textContent=`Periode ${start||"-"} s/d ${end||"-"} | Dicetak ${new Date().toLocaleString("id-ID")}`;
-
-  document.getElementById("printContent").innerHTML=`
-    <table style="width:100%;border-collapse:collapse;font-size:12px">
-      <thead><tr><th style="border:1px solid #000;padding:6px">Waktu</th><th style="border:1px solid #000;padding:6px">Warga</th><th style="border:1px solid #000;padding:6px">Rumah</th><th style="border:1px solid #000;padding:6px">Nominal</th><th style="border:1px solid #000;padding:6px">Petugas</th></tr></thead>
-      <tbody>${rows.map(l=>`<tr><td style="border:1px solid #000;padding:6px">${formatDateTime(l.timestamp)}</td><td style="border:1px solid #000;padding:6px">${escapeHTML(l.nama)}</td><td style="border:1px solid #000;padding:6px">${escapeHTML(l.noRumah)}</td><td style="border:1px solid #000;padding:6px">${formatRupiah(l.nominal)}</td><td style="border:1px solid #000;padding:6px">${escapeHTML(l.officer)}</td></tr>`).join("")}</tbody>
-    </table>
-    <p style="font-weight:bold;margin-top:12px">Total: ${formatRupiah(rows.reduce((s,l)=>s+Number(l.nominal),0))}</p>`;
-  window.print();
-}
-
-/* =========================
-   UTILITAS
-========================= */
-function formatRupiah(number){
-  return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",minimumFractionDigits:0}).format(Number(number)||0);
-}
-function formatDateTime(value){
-  if(!value)return "-";
-  const [d,t]=value.split(" ");
-  const [y,m,day]=d.split("-");
-  return `${day}/${m}/${y} ${t||""}`;
-}
-function escapeHTML(value){
-  return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-}
-
-const Toast=Swal.mixin({
-  toast:true,position:"top-end",showConfirmButton:false,timer:2500,timerProgressBar:true
-});
-  // --- FITUR PENGECEKAN TANGGAL WARGA (HARI INI / KEMARIN / BULAN LALU) ---
-
-function setTodayDateWarga() {
-    document.getElementById('checkDateWarga').value = new Date().toISOString().split('T')[0];
-    renderWargaTable();
-}
-
-function setYesterdayDateWarga() {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    document.getElementById('checkDateWarga').value = yesterday.toISOString().split('T')[0];
-    renderWargaTable();
-}
-
-function renderWargaTable() {
-    const tbody = document.getElementById('tableWargaBody');
-    const search = document.getElementById('searchWarga').value.toLowerCase();
-    const filter = document.getElementById('filterStatus').value;
-    
-    // Mengambil tanggal dari input datepicker (jika kosong, default ke hari ini)
-    const targetDate = document.getElementById('checkDateWarga').value || new Date().toISOString().split('T')[0];
-
-    let paidCount = 0;
-    let unpaidCount = 0;
-
-    const filtered = wargaList.filter(w => {
-        const matchSearch = w.nama.toLowerCase().includes(search) ||
-                            w.noRumah.toLowerCase().includes(search) ||
-                            w.id.toLowerCase().includes(search);
-
-        // Pengecekan status bayar berdasarkan targetDate yang dipilih
-        const isPaid = logsList.some(log => log.wargaId === w.id && log.timestamp.startsWith(targetDate));
-
-        if (isPaid) paidCount++;
-        else unpaidCount++;
-
-        if (filter === 'PAID') return matchSearch && isPaid;
-        if (filter === 'UNPAID') return matchSearch && !isPaid;
-        return matchSearch;
     });
 
-    // Update ringkasan jumlah yang sudah/belum bayar
-    document.getElementById('countPaidWarga').innerText = `${paidCount} KK`;
-    document.getElementById('countUnpaidWarga').innerText = `${unpaidCount} KK`;
+}
+
+
+function checkAuthSession() {
+
+    const saved =
+        localStorage.getItem(STORAGE_KEY_AUTH);
+
+    if (!saved) {
+
+        showLogin();
+
+        return;
+
+    }
+
+
+    try {
+
+        const session =
+            JSON.parse(saved);
+
+        const user =
+            AUTHORIZED_USERS.find(
+                item => item.username === session.username
+            );
+
+
+        if (!user) {
+
+            throw new Error("Session tidak valid");
+
+        }
+
+
+        currentOfficer = user.name;
+
+
+        document.getElementById(
+            "currentOfficerName"
+        ).textContent = currentOfficer;
+
+
+        document.getElementById(
+            "modalLogin"
+        ).classList.add("hidden");
+
+
+        document.getElementById(
+            "app"
+        ).classList.remove("hidden");
+
+
+        initializeApp();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        localStorage.removeItem(STORAGE_KEY_AUTH);
+
+        showLogin();
+
+    }
+
+}
+
+
+function showLogin() {
+
+    document.getElementById(
+        "modalLogin"
+    ).classList.remove("hidden");
+
+    document.getElementById(
+        "app"
+    ).classList.add("hidden");
+
+}
+
+
+function logoutOfficer() {
+
+    Swal.fire({
+
+        title: "Keluar dari aplikasi?",
+
+        icon: "question",
+
+        showCancelButton: true,
+
+        confirmButtonText: "Ya, keluar",
+
+        cancelButtonText: "Batal",
+
+        confirmButtonColor: "#dc2626"
+
+    }).then(result => {
+
+        if (!result.isConfirmed) return;
+
+
+        localStorage.removeItem(
+            STORAGE_KEY_AUTH
+        );
+
+
+        currentOfficer = "";
+
+
+        showLogin();
+
+
+        Swal.fire({
+
+            icon: "success",
+
+            title: "Berhasil keluar",
+
+            timer: 1000,
+
+            showConfirmButton: false
+
+        });
+
+    });
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+function initializeApp() {
+
+    loadData();
+
+    setDefaultDates();
+
+    renderWargaTable();
+
+    renderDashboard();
+
+    renderHistoryTable();
+
+    lucide.createIcons();
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showPage(page) {
+
+    const pages = [
+        "dashboard",
+        "warga",
+        "riwayat"
+    ];
+
+
+    pages.forEach(item => {
+
+        const element =
+            document.getElementById(
+                `page-${item}`
+            );
+
+        if (element) {
+
+            element.classList.toggle(
+                "hidden",
+                item !== page
+            );
+
+        }
+
+
+        const nav =
+            document.getElementById(
+                `nav-${item}`
+            );
+
+        if (nav) {
+
+            nav.classList.toggle(
+                "bg-emerald-100",
+                item === page
+            );
+
+            nav.classList.toggle(
+                "text-emerald-700",
+                item === page
+            );
+
+        }
+
+    });
+
+
+    if (page === "dashboard") {
+        renderDashboard();
+    }
+
+    if (page === "warga") {
+        renderWargaTable();
+    }
+
+    if (page === "riwayat") {
+        renderHistoryTable();
+    }
+
+}
+
+
+/* =========================================================
+   CEK STATUS BAYAR
+========================================================= */
+
+function isWargaPaid(wargaId, tanggal) {
+
+    return logsList.some(log => {
+
+        return String(log.wargaId) === String(wargaId)
+            && String(log.timestamp || "").startsWith(tanggal);
+
+    });
+
+}
+
+
+/* =========================================================
+   DATA WARGA
+========================================================= */
+
+function openWargaModal(id = null) {
+
+    document.getElementById(
+        "modalWarga"
+    ).classList.remove("hidden");
+
+
+    if (id) {
+
+        const warga =
+            wargaList.find(
+                item => String(item.id) === String(id)
+            );
+
+
+        if (!warga) return;
+
+
+        document.getElementById(
+            "wargaModalTitle"
+        ).textContent = "Edit Data Warga";
+
+
+        document.getElementById(
+            "wargaId"
+        ).value = warga.id;
+
+
+        document.getElementById(
+            "wargaRumah"
+        ).value = warga.rumah || "";
+
+
+        document.getElementById(
+            "wargaNama"
+        ).value = warga.nama || "";
+
+
+        document.getElementById(
+            "wargaRT"
+        ).value = warga.rt || "08";
+
+
+        document.getElementById(
+            "wargaRW"
+        ).value = warga.rw || "03";
+
+
+        document.getElementById(
+            "wargaHP"
+        ).value = warga.hp || "";
+
+    } else {
+
+        document.getElementById(
+            "wargaModalTitle"
+        ).textContent = "Tambah Warga";
+
+
+        document.getElementById(
+            "formWarga"
+        ).reset();
+
+
+        document.getElementById(
+            "wargaId"
+        ).value = "";
+
+        document.getElementById(
+            "wargaRW"
+        ).value = "03";
+
+    }
+
+}
+
+
+function closeWargaModal() {
+
+    document.getElementById(
+        "modalWarga"
+    ).classList.add("hidden");
+
+}
+
+
+function saveWarga(event) {
+
+    event.preventDefault();
+
+
+    const id =
+        document.getElementById("wargaId").value;
+
+
+    const rumah =
+        document.getElementById("wargaRumah")
+            .value.trim();
+
+
+    const nama =
+        document.getElementById("wargaNama")
+            .value.trim();
+
+
+    const rt =
+        document.getElementById("wargaRT").value;
+
+
+    const rw =
+        document.getElementById("wargaRW")
+            .value.trim();
+
+
+    const hp =
+        document.getElementById("wargaHP")
+            .value.trim();
+
+
+    if (!rumah || !nama) {
+
+        Swal.fire(
+            "Data belum lengkap",
+            "Nomor rumah dan nama wajib diisi.",
+            "warning"
+        );
+
+        return;
+
+    }
+
+
+    if (id) {
+
+        const index =
+            wargaList.findIndex(
+                item => String(item.id) === String(id)
+            );
+
+
+        if (index !== -1) {
+
+            wargaList[index] = {
+
+                ...wargaList[index],
+
+                rumah,
+                nama,
+                rt,
+                rw,
+                hp
+
+            };
+
+        }
+
+    } else {
+
+        const newWarga = {
+
+            id:
+                "W" +
+                Date.now() +
+                Math.random()
+                    .toString(36)
+                    .substring(2, 6),
+
+            rumah,
+            nama,
+            rt,
+            rw,
+            hp,
+
+            createdAt:
+                new Date().toISOString()
+
+        };
+
+
+        wargaList.push(newWarga);
+
+    }
+
+
+    saveData();
+
+    closeWargaModal();
+
+    renderWargaTable();
+
+    renderDashboard();
+
+
+    Swal.fire({
+
+        icon: "success",
+
+        title: "Berhasil",
+
+        text: id
+            ? "Data warga berhasil diperbarui."
+            : "Data warga berhasil ditambahkan.",
+
+        timer: 1300,
+
+        showConfirmButton: false
+
+    });
+
+}
+
+
+function deleteWarga(id) {
+
+    const warga =
+        wargaList.find(
+            item => String(item.id) === String(id)
+        );
+
+
+    if (!warga) return;
+
+
+    Swal.fire({
+
+        title: "Hapus warga?",
+
+        text: `${warga.nama} akan dihapus.`,
+
+        icon: "warning",
+
+        showCancelButton: true,
+
+        confirmButtonText: "Hapus",
+
+        cancelButtonText: "Batal",
+
+        confirmButtonColor: "#dc2626"
+
+    }).then(result => {
+
+        if (!result.isConfirmed) return;
+
+
+        wargaList =
+            wargaList.filter(
+                item => String(item.id) !== String(id)
+            );
+
+
+        logsList =
+            logsList.filter(
+                log => String(log.wargaId) !== String(id)
+            );
+
+
+        saveData();
+
+        renderWargaTable();
+
+        renderDashboard();
+
+        renderHistoryTable();
+
+    });
+
+}
+
+
+/* =========================================================
+   RENDER WARGA
+========================================================= */
+
+function renderWargaTable() {
+
+    const body =
+        document.getElementById(
+            "wargaTableBody"
+        );
+
+    if (!body) return;
+
+
+    const targetDate =
+        document.getElementById(
+            "checkDateWarga"
+        )?.value || dateOnly();
+
+
+    const search =
+        document.getElementById(
+            "searchWarga"
+        )?.value.trim().toLowerCase() || "";
+
+
+    const filtered =
+        wargaList.filter(warga => {
+
+            if (!search) return true;
+
+
+            return (
+
+                String(warga.nama || "")
+                    .toLowerCase()
+                    .includes(search)
+
+                ||
+
+                String(warga.rumah || "")
+                    .toLowerCase()
+                    .includes(search)
+
+                ||
+
+                String(warga.hp || "")
+                    .toLowerCase()
+                    .includes(search)
+
+            );
+
+        });
+
+
+    let paidCount = 0;
+
+
+    body.innerHTML = "";
+
 
     if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="px-5 py-4 text-center text-slate-400">Data warga tidak ditemukan untuk tanggal ${targetDate}.</td></tr>`;
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td colspan="7"
+                    class="text-center py-10 text-slate-400">
+
+                    Belum ada data warga.
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+
+    filtered.forEach((warga, index) => {
+
+        const paid =
+            isWargaPaid(
+                warga.id,
+                targetDate
+            );
+
+
+        if (paid) {
+            paidCount++;
+        }
+
+
+        const statusHTML = paid
+
+            ? `
+                <span class="inline-flex items-center gap-1
+                             bg-emerald-100 text-emerald-700
+                             px-3 py-1 rounded-full
+                             text-xs font-bold">
+
+                    <i data-lucide="check"
+                       class="w-3 h-3"></i>
+
+                    Sudah Bayar
+
+                </span>
+              `
+
+            : `
+                <span class="inline-flex items-center gap-1
+                             bg-red-100 text-red-700
+                             px-3 py-1 rounded-full
+                             text-xs font-bold">
+
+                    <i data-lucide="x"
+                       class="w-3 h-3"></i>
+
+                    Belum Bayar
+
+                </span>
+              `;
+
+
+        body.innerHTML += `
+
+            <tr class="hover:bg-slate-50">
+
+                <td class="px-4 py-3">
+                    ${index + 1}
+                </td>
+
+                <td class="px-4 py-3 font-semibold">
+                    ${escapeHTML(warga.rumah || "-")}
+                </td>
+
+                <td class="px-4 py-3 font-semibold">
+                    ${escapeHTML(warga.nama || "-")}
+                </td>
+
+                <td class="px-4 py-3">
+                    RT ${escapeHTML(warga.rt || "-")}
+                    / RW ${escapeHTML(warga.rw || "-")}
+                </td>
+
+                <td class="px-4 py-3">
+                    ${escapeHTML(warga.hp || "-")}
+                </td>
+
+                <td class="px-4 py-3">
+                    ${statusHTML}
+                </td>
+
+                <td class="px-4 py-3">
+
+                    <div class="flex justify-center gap-1">
+
+                        ${
+                            !paid
+                            ?
+                            `
+                            <button
+                                onclick="openBayarModal('${warga.id}')"
+                                title="Bayar"
+                                class="bg-emerald-100
+                                       text-emerald-700
+                                       p-2 rounded-lg">
+
+                                <i data-lucide="wallet"
+                                   class="w-4 h-4"></i>
+
+                            </button>
+                            `
+                            :
+                            ""
+                        }
+
+
+                        <button
+                            onclick="openQRModal('${warga.id}')"
+                            title="QR Code"
+                            class="bg-blue-100
+                                   text-blue-700
+                                   p-2 rounded-lg">
+
+                            <i data-lucide="qr-code"
+                               class="w-4 h-4"></i>
+
+                        </button>
+
+
+                        <button
+                            onclick="openWargaModal('${warga.id}')"
+                            title="Edit"
+                            class="bg-amber-100
+                                   text-amber-700
+                                   p-2 rounded-lg">
+
+                            <i data-lucide="pencil"
+                               class="w-4 h-4"></i>
+
+                        </button>
+
+
+                        <button
+                            onclick="deleteWarga('${warga.id}')"
+                            title="Hapus"
+                            class="bg-red-100
+                                   text-red-700
+                                   p-2 rounded-lg">
+
+                            <i data-lucide="trash-2"
+                               class="w-4 h-4"></i>
+
+                        </button>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+
+    document.getElementById(
+        "countTotalWarga"
+    ).textContent = filtered.length;
+
+
+    document.getElementById(
+        "countPaidWarga"
+    ).textContent = paidCount;
+
+
+    document.getElementById(
+        "countUnpaidWarga"
+    ).textContent =
+        Math.max(
+            filtered.length - paidCount,
+            0
+        );
+
+
+    lucide.createIcons();
+
+}
+
+
+/* =========================================================
+   PEMBAYARAN
+========================================================= */
+
+function openBayarModal(id) {
+
+    const warga =
+        wargaList.find(
+            item => String(item.id) === String(id)
+        );
+
+
+    if (!warga) return;
+
+
+    document.getElementById(
+        "bayarWargaId"
+    ).value = warga.id;
+
+
+    document.getElementById(
+        "bayarNama"
+    ).textContent =
+        `${warga.nama} - Rumah ${warga.rumah}`;
+
+
+    document.getElementById(
+        "bayarTanggal"
+    ).value = dateOnly();
+
+
+    document.getElementById(
+        "bayarNominal"
+    ).value = 1000;
+
+
+    document.getElementById(
+        "bayarKeterangan"
+    ).value = "";
+
+
+    document.getElementById(
+        "modalBayar"
+    ).classList.remove("hidden");
+
+}
+
+
+function closeBayarModal() {
+
+    document.getElementById(
+        "modalBayar"
+    ).classList.add("hidden");
+
+}
+
+
+function savePayment(event) {
+
+    event.preventDefault();
+
+
+    const wargaId =
+        document.getElementById(
+            "bayarWargaId"
+        ).value;
+
+
+    const tanggal =
+        document.getElementById(
+            "bayarTanggal"
+        ).value;
+
+
+    const nominal =
+        Number(
+            document.getElementById(
+                "bayarNominal"
+            ).value
+        );
+
+
+    const keterangan =
+        document.getElementById(
+            "bayarKeterangan"
+        ).value.trim();
+
+
+    if (!wargaId || !tanggal || nominal < 0) {
+
+        Swal.fire(
+            "Data belum lengkap",
+            "Periksa kembali data pembayaran.",
+            "warning"
+        );
+
+        return;
+
+    }
+
+
+    const alreadyPaid =
+        isWargaPaid(
+            wargaId,
+            tanggal
+        );
+
+
+    if (alreadyPaid) {
+
+        Swal.fire({
+
+            icon: "warning",
+
+            title: "Sudah membayar",
+
+            text: "Warga ini sudah memiliki pembayaran pada tanggal tersebut."
+
+        });
+
+        return;
+
+    }
+
+
+    const warga =
+        wargaList.find(
+            item => String(item.id) === String(wargaId)
+        );
+
+
+    const log = {
+
+        id:
+            "LOG" +
+            Date.now(),
+
+        wargaId,
+
+        nama:
+            warga?.nama || "-",
+
+        rumah:
+            warga?.rumah || "-",
+
+        nominal,
+
+        timestamp:
+            `${tanggal}T${new Date().toTimeString().split(" ")[0]}`,
+
+        officer:
+            currentOfficer,
+
+        keterangan
+
+    };
+
+
+    logsList.push(log);
+
+    saveData();
+
+    closeBayarModal();
+
+    renderWargaTable();
+
+    renderDashboard();
+
+    renderHistoryTable();
+
+
+    Swal.fire({
+
+        icon: "success",
+
+        title: "Pembayaran berhasil",
+
+        text: `${warga?.nama || "Warga"} telah dicatat membayar.`,
+
+        timer: 1500,
+
+        showConfirmButton: false
+
+    });
+
+}
+
+
+/* =========================================================
+   QR CODE
+========================================================= */
+
+function openQRModal(id) {
+
+    const warga =
+        wargaList.find(
+            item => String(item.id) === String(id)
+        );
+
+
+    if (!warga) return;
+
+
+    document.getElementById(
+        "qrNama"
+    ).textContent = warga.nama;
+
+
+    document.getElementById(
+        "qrId"
+    ).textContent =
+        `ID: ${warga.id} | Rumah: ${warga.rumah}`;
+
+
+    const qr =
+        document.getElementById("qrcode");
+
+
+    qr.innerHTML = "";
+
+
+    new QRCode(qr, {
+
+        text: JSON.stringify({
+
+            id: warga.id,
+
+            nama: warga.nama,
+
+            rumah: warga.rumah,
+
+            rt: warga.rt,
+
+            rw: warga.rw
+
+        }),
+
+        width: 220,
+
+        height: 220
+
+    });
+
+
+    document.getElementById(
+        "modalQR"
+    ).classList.remove("hidden");
+
+}
+
+
+function closeQRModal() {
+
+    document.getElementById(
+        "modalQR"
+    ).classList.add("hidden");
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+function renderDashboard() {
+
+    const today = dateOnly();
+
+
+    const paidWarga =
+        wargaList.filter(
+            warga =>
+                isWargaPaid(
+                    warga.id,
+                    today
+                )
+        );
+
+
+    const unpaidWarga =
+        wargaList.filter(
+            warga =>
+                !isWargaPaid(
+                    warga.id,
+                    today
+                )
+        );
+
+
+    document.getElementById(
+        "dashboardTotalWarga"
+    ).textContent =
+        wargaList.length;
+
+
+    document.getElementById(
+        "dashboardPaid"
+    ).textContent =
+        paidWarga.length;
+
+
+    document.getElementById(
+        "dashboardUnpaid"
+    ).textContent =
+        unpaidWarga.length;
+
+
+    document.getElementById(
+        "dashboardUnpaidBadge"
+    ).textContent =
+        unpaidWarga.length;
+
+
+    const body =
+        document.getElementById(
+            "dashboardUnpaidBody"
+        );
+
+
+    body.innerHTML = "";
+
+
+    if (unpaidWarga.length === 0) {
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td colspan="5"
+                    class="text-center py-8
+                           text-emerald-600 font-semibold">
+
+                    Semua warga sudah membayar hari ini. ✓
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+
+    unpaidWarga.forEach((warga, index) => {
+
+        body.innerHTML += `
+
+            <tr class="hover:bg-slate-50">
+
+                <td class="px-4 py-3">
+                    ${index + 1}
+                </td>
+
+                <td class="px-4 py-3 font-semibold">
+                    ${escapeHTML(warga.rumah || "-")}
+                </td>
+
+                <td class="px-4 py-3">
+                    ${escapeHTML(warga.nama || "-")}
+                </td>
+
+                <td class="px-4 py-3">
+                    RT ${escapeHTML(warga.rt || "-")}
+                    / RW ${escapeHTML(warga.rw || "-")}
+                </td>
+
+                <td class="px-4 py-3">
+                    ${escapeHTML(warga.hp || "-")}
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+}
+
+
+/* =========================================================
+   REKAP BELUM BAYAR
+========================================================= */
+
+function renderUnpaidRecap() {
+
+    const body =
+        document.getElementById(
+            "historyUnpaidBody"
+        );
+
+
+    if (!body) return;
+
+
+    const targetDate =
+        document.getElementById(
+            "filterEndDate"
+        )?.value || dateOnly();
+
+
+    const unpaid =
+        wargaList.filter(
+            warga =>
+                !isWargaPaid(
+                    warga.id,
+                    targetDate
+                )
+        );
+
+
+    document.getElementById(
+        "historyUnpaidCount"
+    ).textContent =
+        `${unpaid.length} KK`;
+
+
+    body.innerHTML = "";
+
+
+    if (unpaid.length === 0) {
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td colspan="6"
+                    class="text-center py-10
+                           text-emerald-600 font-semibold">
+
+                    Semua warga sudah membayar
+                    pada ${formatDate(targetDate)}. ✓
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+
+    unpaid.forEach((warga, index) => {
+
+        body.innerHTML += `
+
+            <tr class="hover:bg-amber-50">
+
+                <td class="px-4 py-3">
+                    ${index + 1}
+                </td>
+
+                <td class="px-4 py-3 font-semibold">
+                    ${escapeHTML(warga.rumah || "-")}
+                </td>
+
+                <td class="px-4 py-3 font-semibold">
+                    ${escapeHTML(warga.nama || "-")}
+                </td>
+
+                <td class="px-4 py-3">
+                    RT ${escapeHTML(warga.rt || "-")}
+                    / RW ${escapeHTML(warga.rw || "-")}
+                </td>
+
+                <td class="px-4 py-3">
+                    ${escapeHTML(warga.hp || "-")}
+                </td>
+
+                <td class="px-4 py-3 text-center">
+
+                    <button
+                        onclick="openBayarModal('${warga.id}')"
+                        class="bg-emerald-100
+                               text-emerald-700
+                               px-3 py-2 rounded-lg
+                               font-semibold">
+
+                        Bayar
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+}
+
+
+/* =========================================================
+   RIWAYAT
+========================================================= */
+
+function renderHistoryTable() {
+
+    const body =
+        document.getElementById(
+            "historyTableBody"
+        );
+
+
+    if (!body) return;
+
+
+    const start =
+        document.getElementById(
+            "filterStartDate"
+        )?.value || "";
+
+
+    const end =
+        document.getElementById(
+            "filterEndDate"
+        )?.value || "";
+
+
+    const filtered =
+        logsList
+            .filter(log => {
+
+                const tanggal =
+                    String(
+                        log.timestamp || ""
+                    ).substring(0, 10);
+
+
+                if (start && tanggal < start) {
+                    return false;
+                }
+
+
+                if (end && tanggal > end) {
+                    return false;
+                }
+
+
+                return true;
+
+            })
+            .sort(
+                (a, b) =>
+                    String(b.timestamp)
+                        .localeCompare(
+                            String(a.timestamp)
+                        )
+            );
+
+
+    body.innerHTML = "";
+
+
+    if (filtered.length === 0) {
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td colspan="6"
+                    class="text-center py-10 text-slate-400">
+
+                    Belum ada transaksi pada periode ini.
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+
+    filtered.forEach(log => {
+
+        body.innerHTML += `
+
+            <tr class="hover:bg-slate-50">
+
+                <td class="px-4 py-3">
+                    ${formatDate(
+                        String(log.timestamp)
+                            .substring(0, 10)
+                    )}
+                </td>
+
+                <td class="px-4 py-3 font-semibold">
+                    ${escapeHTML(log.nama || "-")}
+                </td>
+
+                <td class="px-4 py-3">
+                    ${escapeHTML(log.rumah || "-")}
+                </td>
+
+                <td class="px-4 py-3 font-bold text-emerald-600">
+                    Rp ${formatRupiah(log.nominal)}
+                </td>
+
+                <td class="px-4 py-3">
+                    ${escapeHTML(log.officer || "-")}
+                </td>
+
+                <td class="px-4 py-3">
+                    ${escapeHTML(log.keterangan || "-")}
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+
+    renderUnpaidRecap();
+
+}
+
+
+/* =========================================================
+   SET TANGGAL
+========================================================= */
+
+function setTodayDateWarga() {
+
+    document.getElementById(
+        "checkDateWarga"
+    ).value = dateOnly();
+
+    renderWargaTable();
+
+}
+
+
+function setYesterdayDateWarga() {
+
+    const yesterday =
+        new Date();
+
+    yesterday.setDate(
+        yesterday.getDate() - 1
+    );
+
+
+    document.getElementById(
+        "checkDateWarga"
+    ).value =
+        dateOnly(yesterday);
+
+
+    renderWargaTable();
+
+}
+
+
+/* =========================================================
+   EXPORT CSV
+========================================================= */
+
+function exportCSV() {
+
+    const start =
+        document.getElementById(
+            "filterStartDate"
+        ).value;
+
+
+    const end =
+        document.getElementById(
+            "filterEndDate"
+        ).value;
+
+
+    const filtered =
+        logsList.filter(log => {
+
+            const tanggal =
+                String(
+                    log.timestamp || ""
+                ).substring(0, 10);
+
+
+            return (
+
+                (!start || tanggal >= start)
+
+                &&
+
+                (!end || tanggal <= end)
+
+            );
+
+        });
+
+
+    let csv =
+        "Tanggal,Nama,Rumah,Nominal,Petugas,Keterangan\n";
+
+
+    filtered.forEach(log => {
+
+        csv += [
+
+            String(log.timestamp)
+                .substring(0, 10),
+
+            csvEscape(log.nama),
+
+            csvEscape(log.rumah),
+
+            log.nominal,
+
+            csvEscape(log.officer),
+
+            csvEscape(log.keterangan)
+
+        ].join(",") + "\n";
+
+    });
+
+
+    const blob =
+        new Blob(
+            [csv],
+            {
+                type: "text/csv;charset=utf-8;"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const a =
+        document.createElement("a");
+
+
+    a.href = url;
+
+    a.download =
+        `rekap-jimpitan-${dateOnly()}.csv`;
+
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+/* =========================================================
+   FORMAT
+========================================================= */
+
+function formatRupiah(value) {
+
+    return Number(value || 0)
+        .toLocaleString(
+            "id-ID"
+        );
+
+}
+
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+function csvEscape(value) {
+
+    const text =
+        String(value ?? "");
+
+
+    return `"${text.replaceAll('"', '""')}"`;
+
+}
+
+
+/* =========================================================
+   CONTOH DATA AWAL
+   HANYA DIBUAT JIKA BELUM ADA DATA
+========================================================= */
+
+function createInitialData() {
+
+    if (wargaList.length > 0) {
         return;
     }
 
-    tbody.innerHTML = filtered.map(w => {
-        const isPaid = logsList.some(log => log.wargaId === w.id && log.timestamp.startsWith(targetDate));
-        const statusBadge = isPaid
-            ? `<span class="bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1 rounded-full text-xs">Sudah Bayar</span>`
-            : `<span class="bg-rose-100 text-rose-700 font-semibold px-2.5 py-1 rounded-full text-xs">Belum Bayar</span>`;
 
-        return `
-            <tr class="hover:bg-slate-50">
-                <td class="px-5 py-3.5 font-bold text-slate-800">${w.noRumah} <span class="text-xs text-slate-400 block font-normal">${w.id}</span></td>
-                <td class="px-5 py-3.5 font-medium">${w.nama}</td>
-                <td class="px-5 py-3.5">RT ${w.rt} / RW ${w.rw}</td>
-                <td class="px-5 py-3.5">${statusBadge}</td>
-                <td class="px-5 py-3.5 text-center">
-                    <button onclick="showQRModal('${w.id}')" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition">
-                        <i data-lucide="qr-code" class="w-4 h-4"></i>
-                    </button>
-                </td>
-                <td class="px-5 py-3.5 text-right space-x-1">
-                    <button onclick="editWarga('${w.id}')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition"><i data-lucide="edit" class="w-4 h-4"></i></button>
-                    <button onclick="deleteWarga('${w.id}')" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                </td>
-            </tr>
-        `;
-    }).join('');
+    wargaList = [
 
-    lucide.createIcons();
+        {
+            id: "W001",
+            rumah: "001",
+            nama: "Budi Santoso",
+            rt: "08",
+            rw: "03",
+            hp: "081234567890",
+            createdAt: new Date().toISOString()
+        },
+
+        {
+            id: "W002",
+            rumah: "002",
+            nama: "Agus Pratama",
+            rt: "08",
+            rw: "03",
+            hp: "081234567891",
+            createdAt: new Date().toISOString()
+        },
+
+        {
+            id: "W003",
+            rumah: "003",
+            nama: "Siti Aminah",
+            rt: "08",
+            rw: "03",
+            hp: "081234567892",
+            createdAt: new Date().toISOString()
+        },
+
+        {
+            id: "W004",
+            rumah: "004",
+            nama: "Dewi Lestari",
+            rt: "09",
+            rw: "03",
+            hp: "081234567893",
+            createdAt: new Date().toISOString()
+        },
+
+        {
+            id: "W005",
+            rumah: "005",
+            nama: "Rudi Hartono",
+            rt: "09",
+            rw: "03",
+            hp: "081234567894",
+            createdAt: new Date().toISOString()
+        }
+
+    ];
+
+
+    saveData();
+
 }
 
-// Inisialisasi default tanggal saat halaman dimuat
-document.addEventListener('DOMContentLoaded', () => {
-    const inputDate = document.getElementById('checkDateWarga');
-    if (inputDate) {
-        inputDate.value = new Date().toISOString().split('T')[0];
+
+/* =========================================================
+   START APPLICATION
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        lucide.createIcons();
+
+        loadData();
+
+        createInitialData();
+
+        setDefaultDates();
+
+        checkAuthSession();
+
     }
-});
+);
+
 </script>
+
 </body>
 </html>
