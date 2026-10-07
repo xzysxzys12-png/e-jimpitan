@@ -1455,21 +1455,47 @@ function printExpenses(){
 /* =========================
    UTILITAS
 ========================= */
-function formatRupiah(number){
-  return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",minimumFractionDigits:0}).format(Number(number)||0);
-}
-function formatDateTime(value){
-  if(!value)return "-";
-  const [d,t]=value.split(" ");
-  const [y,m,day]=d.split("-");
-  return `${day}/${m}/${y} ${t||""}`;
-}
-function escapeHTML(value){
-  return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+// 1. Fungsi Format Rupiah (Aman dari string/titik/koma)
+function formatRupiah(number) {
+  const cleanNumber = typeof number === "string" ? number.replace(/\D/g, "") : number;
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0
+  }).format(Number(cleanNumber) || 0);
 }
 
-const Toast=Swal.mixin({
-  toast:true,position:"top-end",showConfirmButton:false,timer:2500,timerProgressBar:true
+// 2. Fungsi Format Tanggal & Jam (Aman untuk berbagai format input)
+function formatDateTime(value) {
+  if (!value) return "-";
+  
+  // Jika formatnya "YYYY-MM-DD HH:mm" atau "YYYY-MM-DD"
+  const parts = String(value).trim().split(" ");
+  const datePart = parts[0]; // "YYYY-MM-DD"
+  const timePart = parts[1] || ""; // "HH:mm" (jika ada)
+
+  if (!datePart.includes("-")) return value; // Kembalikan nilai asli jika format berbeda
+
+  const [y, m, day] = datePart.split("-");
+  if (!y || !m || !day) return value;
+
+  return timePart ? `${day}/${m}/${y} ${timePart}` : `${day}/${m}/${y}`;
+}
+
+// 3. Fungsi Escape HTML (Mencegah XSS)
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+  }[c]));
+}
+
+// 4. Konfigurasi Toast SweetAlert2
+const Toast = Swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timer: 2500,
+  timerProgressBar: true
 });
 </script>
 </body>
