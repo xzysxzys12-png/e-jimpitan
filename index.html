@@ -29,6 +29,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- PDF (untuk tombol Cetak, berfungsi di HP) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <!-- Firebase (penyimpanan online agar data sama di semua HP) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -37,12 +40,6 @@
     body{font-family:'Plus Jakarta Sans',sans-serif}
     .scrollbar-none::-webkit-scrollbar{display:none}
     .scrollbar-none{scrollbar-width:none}
-    @media print{
-      .no-print{display:none!important}
-      .print-only{display:block!important}
-      body{background:#fff!important}
-    }
-    .print-only{display:none}
     #qr-reader video{border-radius:12px!important}
     #qr-reader__scan_region{min-height:260px}
     #qr-reader__dashboard_section_csr button{border:0!important;border-radius:10px!important;padding:8px 12px!important}
@@ -227,7 +224,7 @@
 <section id="view-riwayat" class="hidden space-y-6">
   <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
-      <div><h2 class="font-bold text-lg">Catatan & Rekap Jimpitan</h2><p class="text-xs text-slate-500">Histori dana jimpitan. <span class="text-slate-300">v3</span></p></div>
+      <div><h2 class="font-bold text-lg">Catatan & Rekap Jimpitan</h2><p class="text-xs text-slate-500">Histori dana jimpitan. <span class="text-slate-300">v4</span></p></div>
       <div class="flex flex-wrap gap-2">
         <button onclick="exportToCSV()" class="bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i>Export CSV</button>
         <button onclick="backupDataJimpitan()" class="bg-blue-50 text-blue-700 border border-blue-200 font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5"><i data-lucide="download" class="w-4 h-4"></i>Backup Data</button>
@@ -302,15 +299,6 @@
       <b>Akun demo:</b> ketua / kt1 &nbsp;•&nbsp; petugas01 / p01
     </div>
   </div>
-</div>
-
-<div class="print-only p-8 text-black">
-  <div class="text-center mb-6 border-b pb-4">
-    <h1 class="text-2xl font-bold">REKAP KAS JIMPITAN DIGITAL</h1>
-    <p class="text-sm">RT 08 & 09 / RW 03 - Dusun Gebang Kelopo</p>
-    <p id="printDate" class="text-xs mt-1"></p>
-  </div>
-  <div id="printContent"></div>
 </div>
 
 <script>
@@ -1153,7 +1141,7 @@ function deleteLog(id){
 }
 
 /* =========================
-   EXPORT & PRINT
+   EXPORT & CETAK (PDF)
 ========================= */
 function csvEscape(value){
   return `"${String(value??"").replace(/"/g,'""')}"`;
@@ -1186,15 +1174,49 @@ function printReport(){
     return (!start||d>=start)&&(!end||d<=end);
   }).sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
 
-  document.getElementById("printDate").textContent=`Periode ${start||"-"} s/d ${end||"-"} | Dicetak ${new Date().toLocaleString("id-ID")}`;
+  if(!rows.length){
+    Swal.fire("Data Kosong","Tidak ada transaksi pada periode ini.","info");
+    return;
+  }
 
-  document.getElementById("printContent").innerHTML=`
-    <table style="width:100%;border-collapse:collapse;font-size:12px">
-      <thead><tr><th style="border:1px solid #000;padding:6px">Waktu</th><th style="border:1px solid #000;padding:6px">Warga</th><th style="border:1px solid #000;padding:6px">Rumah</th><th style="border:1px solid #000;padding:6px">Nominal</th><th style="border:1px solid #000;padding:6px">Petugas</th></tr></thead>
-      <tbody>${rows.map(l=>`<tr><td style="border:1px solid #000;padding:6px">${formatDateTime(l.timestamp)}</td><td style="border:1px solid #000;padding:6px">${escapeHTML(l.nama)}</td><td style="border:1px solid #000;padding:6px">${escapeHTML(l.noRumah)}</td><td style="border:1px solid #000;padding:6px">${formatRupiah(l.nominal)}</td><td style="border:1px solid #000;padding:6px">${escapeHTML(l.officer)}</td></tr>`).join("")}</tbody>
-    </table>
-    <p style="font-weight:bold;margin-top:12px">Total: ${formatRupiah(rows.reduce((s,l)=>s+Number(l.nominal),0))}</p>`;
-  window.print();
+  if(!window.jspdf){
+    Swal.fire("Library PDF belum dimuat","Periksa koneksi internet lalu muat ulang halaman.","error");
+    return;
+  }
+
+  const total=rows.reduce((s,l)=>s+Number(l.nominal||0),0);
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+
+  doc.setFontSize(14);
+  doc.text("REKAP KAS JIMPITAN DIGITAL",105,14,{align:"center"});
+  doc.setFontSize(10);
+  doc.text("RT 08 & 09 / RW 03 - Dusun Gebang Kelopo",105,20,{align:"center"});
+  doc.setFontSize(8);
+  doc.text(`Periode ${start||"-"} s/d ${end||"-"} | Dicetak ${new Date().toLocaleString("id-ID")}`,105,25,{align:"center"});
+
+  doc.autoTable({
+    startY:30,
+    head:[["Waktu","Warga","Rumah","Nominal","Petugas"]],
+    body:rows.map(l=>[formatDateTime(l.timestamp),l.nama,l.noRumah,formatRupiah(l.nominal),l.officer]),
+    foot:[["","","Total",formatRupiah(total),""]],
+    styles:{fontSize:9},
+    headStyles:{fillColor:[21,128,61]},
+    footStyles:{fillColor:[240,240,240],textColor:0}
+  });
+
+  const fileName=`Rekap_Jimpitan_${dateOnly()}.pdf`;
+  const file=new File([doc.output("blob")],fileName,{type:"application/pdf"});
+
+  // Di HP: buka menu Bagikan (WhatsApp, Drive, Print, dll). Di PC: unduh biasa.
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    navigator.share({files:[file],title:"Rekap Jimpitan"}).catch(err=>{
+      if(err && err.name==="AbortError") return; // pengguna menutup menu Bagikan
+      doc.save(fileName);
+    });
+  }else{
+    doc.save(fileName);
+  }
 }
 
 /* =========================
