@@ -54,26 +54,26 @@
 <header class="bg-brand-700 text-white sticky top-0 z-30 shadow-md no-print">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
-      <div class="flex items-center gap-3">
-        <div class="bg-white/10 p-2 rounded-xl">
-          <i data-lucide="coins" class="w-6 h-6 text-emerald-300"></i>
+      <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div class="bg-white/10 p-2 rounded-xl shrink-0">
+          <i data-lucide="coins" class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-300"></i>
         </div>
-        <div>
-          <h1 class="font-bold text-lg leading-tight">E-Jimpitan Digital</h1>
-          <p class="text-xs text-brand-100">RT 08 & 09 / RW 03 Dusun Gebang Kelopo</p>
+        <div class="min-w-0">
+          <h1 class="font-bold text-sm sm:text-lg leading-tight truncate">E-Jimpitan Digital</h1>
+          <p class="text-[10px] sm:text-xs text-brand-100 truncate">RT 08 & 09 / RW 03 <span class="hidden sm:inline">Dusun Gebang Kelopo</span></p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
         <div id="syncStatus" class="flex items-center gap-1.5 text-[11px] bg-white/10 px-2.5 py-1.5 rounded-lg" title="Status sinkron data">
           <span id="syncDot" class="w-2 h-2 rounded-full bg-amber-300"></span>
           <span id="syncText" class="hidden sm:inline">Menyambung...</span>
         </div>
-        <div class="hidden sm:flex items-center gap-3 bg-brand-800/50 px-3 py-1.5 rounded-lg border border-brand-600">
-          <i data-lucide="user-check" class="w-4 h-4 text-emerald-300"></i>
-          <div class="text-xs">
+        <div class="flex items-center gap-2 sm:gap-3 bg-brand-800/50 px-2 sm:px-3 py-1.5 rounded-lg border border-brand-600">
+          <i data-lucide="user-check" class="hidden sm:block w-4 h-4 text-emerald-300"></i>
+          <div class="text-xs min-w-0">
             <span class="block text-brand-200 text-[10px] uppercase font-semibold">Petugas</span>
-            <span id="currentOfficerName" class="font-semibold text-white">-</span>
+            <span id="currentOfficerName" class="block font-semibold text-white truncate max-w-[84px] sm:max-w-none">-</span>
           </div>
           <button onclick="changeOfficer()" class="text-xs bg-brand-600 hover:bg-brand-500 px-2 py-1 rounded">Ganti</button>
         </div>
