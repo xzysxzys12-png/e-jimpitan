@@ -224,7 +224,7 @@
 <section id="view-riwayat" class="hidden space-y-6">
   <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
-      <div><h2 class="font-bold text-lg">Catatan & Rekap Jimpitan</h2><p class="text-xs text-slate-500">Histori dana jimpitan. <span class="text-slate-300">v4</span></p></div>
+      <div><h2 class="font-bold text-lg">Catatan & Rekap Jimpitan</h2><p class="text-xs text-slate-500">Histori dana jimpitan. <span class="text-slate-300">v5</span></p></div>
       <div class="flex flex-wrap gap-2">
         <button onclick="exportToCSV()" class="bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i>Export CSV</button>
         <button onclick="backupDataJimpitan()" class="bg-blue-50 text-blue-700 border border-blue-200 font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5"><i data-lucide="download" class="w-4 h-4"></i>Backup Data</button>
@@ -1166,7 +1166,7 @@ function exportToCSV(){
   URL.revokeObjectURL(url);
 }
 
-function printReport(){
+function buatPDFRekap(){
   const start=document.getElementById("filterStartDate").value;
   const end=document.getElementById("filterEndDate").value;
   const rows=logsList.filter(l=>{
@@ -1174,20 +1174,13 @@ function printReport(){
     return (!start||d>=start)&&(!end||d<=end);
   }).sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
 
-  if(!rows.length){
-    Swal.fire("Data Kosong","Tidak ada transaksi pada periode ini.","info");
-    return;
-  }
+  if(!rows.length) throw new Error("Tidak ada transaksi pada periode ini.");
+  if(!window.jspdf) throw new Error("Library PDF (jsPDF) gagal dimuat. Periksa internet lalu muat ulang halaman.");
 
-  if(!window.jspdf){
-    Swal.fire("Library PDF belum dimuat","Periksa koneksi internet lalu muat ulang halaman.","error");
-    return;
-  }
+  const doc=new window.jspdf.jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+  if(typeof doc.autoTable!=="function") throw new Error("Library tabel PDF (autoTable) gagal dimuat. Periksa internet lalu muat ulang halaman.");
 
   const total=rows.reduce((s,l)=>s+Number(l.nominal||0),0);
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
-
   doc.setFontSize(14);
   doc.text("REKAP KAS JIMPITAN DIGITAL",105,14,{align:"center"});
   doc.setFontSize(10);
@@ -1204,19 +1197,54 @@ function printReport(){
     headStyles:{fillColor:[21,128,61]},
     footStyles:{fillColor:[240,240,240],textColor:0}
   });
+  return doc;
+}
+
+function printReport(){
+  let doc;
+  try{
+    doc=buatPDFRekap();
+  }catch(err){
+    console.error(err);
+    Swal.fire({icon:"error",title:"Gagal membuat PDF",text:err.message});
+    return;
+  }
 
   const fileName=`Rekap_Jimpitan_${dateOnly()}.pdf`;
-  const file=new File([doc.output("blob")],fileName,{type:"application/pdf"});
+  const blob=doc.output("blob");
+  const url=URL.createObjectURL(blob);
+  let file=null;
+  try{file=new File([blob],fileName,{type:"application/pdf"});}catch(e){}
+  const bisaShare=!!(file && navigator.canShare && navigator.canShare({files:[file]}));
 
-  // Di HP: buka menu Bagikan (WhatsApp, Drive, Print, dll). Di PC: unduh biasa.
-  if(navigator.canShare && navigator.canShare({files:[file]})){
-    navigator.share({files:[file],title:"Rekap Jimpitan"}).catch(err=>{
-      if(err && err.name==="AbortError") return; // pengguna menutup menu Bagikan
-      doc.save(fileName);
-    });
-  }else{
-    doc.save(fileName);
-  }
+  Swal.fire({
+    icon:"success",
+    title:"PDF siap",
+    text:"Pilih cara menyimpan / mencetak rekap.",
+    showCancelButton:true,
+    showDenyButton:true,
+    confirmButtonText:bisaShare?"Bagikan / Cetak":"Unduh PDF",
+    denyButtonText:"Lihat PDF",
+    cancelButtonText:"Tutup",
+    confirmButtonColor:"#16a34a"
+  }).then(r=>{
+    if(r.isConfirmed){
+      if(bisaShare){
+        navigator.share({files:[file],title:"Rekap Jimpitan"}).catch(err=>{
+          if(err && err.name==="AbortError") return;
+          Swal.fire({icon:"warning",title:"Menu Bagikan gagal",text:"Gunakan tombol Unduh / Lihat PDF. ("+(err&&err.name||"error")+")"});
+        });
+      }else{
+        const a=document.createElement("a");
+        a.href=url;a.download=fileName;
+        document.body.appendChild(a);a.click();a.remove();
+      }
+    }else if(r.isDenied){
+      // buka PDF di tab yang sama; dari sana pakai menu browser: Bagikan / Cetak
+      window.location.href=url;
+    }
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+  });
 }
 
 /* =========================
